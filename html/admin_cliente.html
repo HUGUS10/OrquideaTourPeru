@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi cuenta | Orquídea Tour Perú</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../config/tailwind-config.js"></script>
+    <link rel="stylesheet" href="../css/styles.css">
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head><body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-500 selection:text-white"><div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div><div id="view-client-panel" class="min-h-screen bg-slate-100 flex flex-col">
+        <!-- HEADER PANEL -->
+        <header class="bg-white border-b border-slate-200 py-3 px-4 sm:px-6 flex justify-between items-center gap-3 sticky top-0 z-30">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('landing')">
+                <div class="w-8 h-8 rounded-lg bg-white border border-brand-100 flex items-center justify-center overflow-hidden">
+                    <img src="../img/logo.png" alt="Orquídea Tour Perú" class="w-full h-full object-contain">
+                </div>
+                <span class="font-extrabold text-slate-900 text-xs sm:text-sm tracking-tight">ORQUÍDEA TOUR PERÚ <span class="hidden sm:inline text-xs text-brand-600 font-normal">| Portal Cliente</span></span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2 text-sm">
+                    <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center overflow-hidden font-bold">
+                        <img id="client-header-avatar" class="hidden w-full h-full object-cover" alt="Foto de perfil del cliente">
+                        <i id="client-header-avatar-placeholder" class="fa-solid fa-user" aria-hidden="true"></i>
+                    </div>
+                    <span id="client-header-name" class="font-bold text-slate-700 hidden sm:inline">Hugo Sánchez</span>
+                </div>
+                <button onclick="signOut()" class="text-slate-500 hover:text-rose-600 text-sm font-semibold flex items-center gap-1 shrink-0">
+                    <i class="fa-solid fa-right-from-bracket"></i><span class="hidden sm:inline">Salir</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 flex max-w-7xl w-full mx-auto p-4 sm:p-6 gap-6">
+            <!-- SIDEBAR CLIENTE -->
+            <aside class="w-64 bg-white rounded-2xl border border-slate-200 p-4 hidden md:block shadow-sm">
+                <nav class="space-y-1 text-sm font-medium">
+                    <button type="button" onclick="switchClientTab('home')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-brand-50 text-brand-700 font-bold text-left">
+                        <i class="fa-solid fa-house"></i> Inicio
+                    </button>
+                    <button type="button" onclick="switchClientTab('profile')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+                        <i class="fa-solid fa-user"></i> Mi Perfil
+                    </button>
+                    <button type="button" onclick="switchClientTab('bookings')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+                        <i class="fa-solid fa-ticket"></i> Mis Reservas
+                    </button>
+                    <button type="button" onclick="navigatePage('pasajes.html')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+                        <i class="fa-solid fa-boarding-pass"></i> Mis Pasajes
+                    </button>
+                    <button type="button" onclick="navigatePage('boletas.html')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+                        <i class="fa-solid fa-receipt"></i> Mis Comprobantes
+                    </button>
+                    <button type="button" onclick="switchView('landing'); scrollToSection('paquetes')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition text-left">
+                        <i class="fa-solid fa-plus-circle"></i> Nueva Reserva
+                    </button>
+                </nav>
+            </aside>
+
+            <!-- MAIN CLIENTE -->
+            <main class="flex-1 space-y-6">
+                <label class="sr-only" for="client-mobile-nav">Sección del portal cliente</label>
+                <select id="client-mobile-nav" onchange="switchClientTab(this.value)" class="md:hidden w-full bg-white border border-slate-200 px-3 py-2.5 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    <option value="home">Inicio</option>
+                    <option value="profile">Mi perfil</option>
+                    <option value="bookings">Mis reservas</option>
+                </select>
+                <div class="grid grid-cols-2 gap-2 md:hidden">
+                    <button type="button" onclick="navigatePage('pasajes.html')" class="bg-white border border-slate-200 px-3 py-2.5 rounded-lg text-sm font-semibold text-slate-700"><i class="fa-solid fa-ticket mr-2 text-brand-600"></i>Pasajes</button>
+                    <button type="button" onclick="navigatePage('boletas.html')" class="bg-white border border-slate-200 px-3 py-2.5 rounded-lg text-sm font-semibold text-slate-700"><i class="fa-solid fa-receipt mr-2 text-brand-600"></i>Comprobantes</button>
+                </div>
+
+                <section id="client-tab-home" class="space-y-6">
+                <!-- BIENVENIDA -->
+                <div class="bg-gradient-to-r from-brand-700 to-emerald-600 rounded-2xl p-5 sm:p-6 text-white shadow-lg flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+                    <div>
+                        <h2 class="text-2xl font-black">Bienvenido, <span id="client-welcome-name">Hugo Sánchez</span></h2>
+                        <p class="text-xs text-brand-100 mt-1">Gestiona el estado de tus reservas turísticas y consulta detalles de tus viajes.</p>
+                    </div>
+                    <button onclick="switchView('landing')" class="bg-white text-brand-800 text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-brand-50 transition shadow">
+                        + Explorar nuevos paquetes
+                    </button>
+                </div>
+
+                <!-- CARDS DE ESTADÍSTICA CLIENTE -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <span class="text-slate-400 text-xs font-bold uppercase block">Activas</span>
+                        <span id="client-active-count" class="text-2xl font-black text-slate-800">0</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <span class="text-slate-400 text-xs font-bold uppercase block">Pendientes</span>
+                        <span id="client-pending-count" class="text-2xl font-black text-amber-600">0</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <span class="text-slate-400 text-xs font-bold uppercase block">Confirmadas</span>
+                        <span id="client-confirmed-count" class="text-2xl font-black text-emerald-600">0</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <span class="text-slate-400 text-xs font-bold uppercase block">Finalizadas</span>
+                        <span id="client-finished-count" class="text-2xl font-black text-slate-400">0</span>
+                    </div>
+                </div>
+
+                <!-- TABLA MIS PRÓXIMAS RESERVAS -->
+                <div id="client-bookings" class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm scroll-mt-24">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-base">Mis Reservas</h3>
+                            <p class="text-xs text-slate-500 mt-1">Consulta el estado y los detalles de tus viajes.</p>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full sm:w-auto">
+                            <label class="sr-only" for="client-booking-search">Buscar en mis reservas</label>
+                            <input id="client-booking-search" type="search" oninput="renderBookings()" placeholder="Buscar código o paquete" class="w-full sm:w-56 px-3 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <label class="sr-only" for="client-booking-status">Filtrar por estado</label>
+                            <select id="client-booking-status" onchange="renderBookings()" class="w-full sm:w-40 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <option value="">Todos los estados</option>
+                                <option value="PENDIENTE">Pendientes</option>
+                                <option value="CONFIRMADA">Confirmadas</option>
+                                <option value="CANCELADA">Canceladas</option>
+                                <option value="FINALIZADA">Finalizadas</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-600">
+                            <thead class="bg-slate-50 uppercase text-slate-400 font-bold border-b border-slate-200">
+                                <tr>
+                                    <th class="p-3">Código</th>
+                                    <th class="p-3">Paquete Turístico</th>
+                                    <th class="p-3">Fecha Viaje</th>
+                                    <th class="p-3">Pers.</th>
+                                    <th class="p-3">Total</th>
+                                    <th class="p-3">Estado</th>
+                                    <th class="p-3 text-right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="client-bookings-body" class="divide-y divide-slate-100">
+                                <tr>
+                                    <td class="p-3 font-bold text-brand-700">RES-000125</td>
+                                    <td class="p-3 font-medium text-slate-800">Experiencia Machu Picchu</td>
+                                    <td class="p-3">15/10/2026</td>
+                                    <td class="p-3">3</td>
+                                    <td class="p-3 font-bold">S/ 2,040</td>
+                                    <td class="p-3"><span class="bg-amber-100 text-amber-800 font-bold px-2.5 py-0.5 rounded-full text-[10px]">PENDIENTE</span></td>
+                                    <td class="p-3 text-right">
+                                        <button class="text-slate-500 hover:text-slate-800 font-bold mr-2">Ver</button>
+                                        <button class="text-rose-500 hover:text-rose-700 font-bold">Cancelar</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-brand-700">RES-000118</td>
+                                    <td class="p-3 font-medium text-slate-800">Paracas & Huacachina</td>
+                                    <td class="p-3">02/11/2026</td>
+                                    <td class="p-3">2</td>
+                                    <td class="p-3 font-bold">S/ 640</td>
+                                    <td class="p-3"><span class="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full text-[10px]">CONFIRMADA</span></td>
+                                    <td class="p-3 text-right">
+                                        <button class="text-slate-500 hover:text-slate-800 font-bold">Ver Voucher</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                </section>
+
+                <section id="client-tab-profile" class="hidden bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-extrabold text-slate-900">Mi perfil</h2>
+                        <p class="text-sm text-slate-500 mt-1">Mantén actualizados tus datos de contacto y documento.</p>
+                    </div>
+                    <form id="client-profile-form" onsubmit="event.preventDefault(); saveClientProfile(this);" class="space-y-5">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-4 pb-5 border-b border-slate-100">
+                            <div class="w-20 h-20 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center overflow-hidden border border-slate-200">
+                                <img id="client-profile-avatar" class="hidden w-full h-full object-cover" alt="Vista previa de foto de perfil">
+                                <i id="client-profile-avatar-placeholder" class="fa-solid fa-user text-2xl" aria-hidden="true"></i>
+                            </div>
+                            <div class="space-y-2">
+                                <label for="profile-avatar" class="inline-flex items-center gap-2 cursor-pointer text-sm font-bold text-brand-700 hover:text-brand-900"><i class="fa-solid fa-camera" aria-hidden="true"></i> Elegir foto de perfil</label>
+                                <input id="profile-avatar" type="file" accept="image/*" onchange="handleAvatarUpload(this)" class="sr-only">
+                                <p class="text-xs text-slate-500">Imagen JPG, PNG o WEBP. Tamaño máximo: 2 MB.</p>
+                                <button type="button" onclick="clearClientAvatar()" class="text-xs text-slate-500 hover:text-rose-600">Quitar foto</button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="profile-first-name" class="block text-xs font-bold text-slate-600 uppercase mb-1">Nombres</label>
+                                <input id="profile-first-name" name="firstName" required autocomplete="given-name" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label for="profile-last-name" class="block text-xs font-bold text-slate-600 uppercase mb-1">Apellidos</label>
+                                <input id="profile-last-name" name="lastName" required autocomplete="family-name" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label for="profile-document" class="block text-xs font-bold text-slate-600 uppercase mb-1">DNI / Pasaporte</label>
+                                <input id="profile-document" name="document" required autocomplete="off" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label for="profile-phone" class="block text-xs font-bold text-slate-600 uppercase mb-1">Teléfono</label>
+                                <input id="profile-phone" name="phone" type="tel" required autocomplete="tel" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label for="profile-email" class="block text-xs font-bold text-slate-600 uppercase mb-1">Correo electrónico</label>
+                                <input id="profile-email" name="email" type="email" required autocomplete="email" class="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                        </div>
+                        <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 border-t border-slate-100 pt-4">
+                            <button type="button" onclick="resetClientProfile()" class="px-4 py-2.5 rounded-lg border border-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-50">Descartar cambios</button>
+                            <button type="submit" class="px-4 py-2.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm"><i class="fa-solid fa-floppy-disk mr-2"></i>Guardar perfil</button>
+                        </div>
+                    </form>
+                </section>
+            </main>
+        </div>
+    </div><div id="modal-client-booking" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <section class="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl p-5 sm:p-6 relative" aria-labelledby="client-booking-detail-title">
+            <button type="button" onclick="closeModal('modal-client-booking')" aria-label="Cerrar detalle" class="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100"><i class="fa-solid fa-xmark"></i></button>
+            <h2 id="client-booking-detail-title" class="text-xl font-extrabold text-slate-900 pr-10">Detalle de reserva</h2>
+            <dl class="mt-5 divide-y divide-slate-100 text-sm">
+                <div class="py-3 flex justify-between gap-4"><dt class="text-slate-500">Código</dt><dd id="client-detail-code" class="font-bold text-slate-900"></dd></div>
+                <div class="py-3 flex justify-between gap-4"><dt class="text-slate-500">Paquete</dt><dd id="client-detail-package" class="font-semibold text-slate-900 text-right"></dd></div>
+                <div class="py-3 flex justify-between gap-4"><dt class="text-slate-500">Fecha</dt><dd id="client-detail-date" class="font-semibold text-slate-900"></dd></div>
+                <div class="py-3 flex justify-between gap-4"><dt class="text-slate-500">Pasajeros</dt><dd id="client-detail-passengers" class="font-semibold text-slate-900"></dd></div>
+                <div class="py-3 flex justify-between gap-4"><dt class="text-slate-500">Total</dt><dd id="client-detail-total" class="font-extrabold text-brand-700"></dd></div>
+                <div class="py-3 flex justify-between gap-4"><dt class="text-slate-500">Estado</dt><dd id="client-detail-status" class="font-bold"></dd></div>
+            </dl>
+            <div id="client-detail-actions" class="pt-4"></div>
+        </section>
+    </div>    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../config/supabase-config.js"></script>
+    <script src="../config/app-config.js"></script>    <script src="../js/supabase-data.js"></script>
+    <script src="../js/app.js"></script>
+</body>
+</html>

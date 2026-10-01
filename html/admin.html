@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración | Orquídea Tour Perú</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../config/tailwind-config.js"></script>
+    <link rel="stylesheet" href="../css/styles.css">
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head><body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-500 selection:text-white"><div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div><div id="view-admin-panel" class="min-h-screen bg-slate-900 text-slate-100 flex">
+        
+        <!-- SIDEBAR ADMIN -->
+        <aside class="w-64 bg-slate-950 border-r border-slate-800 flex flex-col justify-between hidden md:flex sticky top-0 h-screen">
+            <div class="p-4">
+                <div class="flex items-center space-x-2 text-white font-bold text-base mb-8 px-2">
+                    <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center overflow-hidden">
+                        <img src="../img/logo.png" alt="Orquídea Tour Perú" class="w-full h-full object-contain">
+                    </div>
+                    <div>
+                        <span class="block leading-none">ORQUÍDEA</span>
+                        <span class="text-[10px] text-brand-400 font-mono">ADMIN PANEL v2.6</span>
+                    </div>
+                </div>
+
+                <nav class="space-y-1 text-xs">
+                    <span class="text-slate-500 font-bold uppercase tracking-wider px-3 block mb-2 text-[10px]">Gestión Principal</span>
+                    <button onclick="switchAdminTab('dash')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-brand-600 text-white font-semibold text-left">
+                        <i class="fa-solid fa-chart-pie w-4"></i> Dashboard
+                    </button>
+                    <button onclick="switchAdminTab('reservas')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
+                        <i class="fa-solid fa-calendar-check w-4"></i> Control Reservas
+                    </button>
+                    <button onclick="switchAdminTab('ventas')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
+                        <i class="fa-solid fa-cash-register w-4"></i> Ventas
+                    </button>
+                    <button onclick="switchAdminTab('clientes')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
+                        <i class="fa-solid fa-users w-4"></i> Clientes
+                    </button>
+                    <button onclick="switchAdminTab('paquetes')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
+                        <i class="fa-solid fa-cubes w-4"></i> Paquetes
+                    </button>
+                    <button onclick="switchAdminTab('promociones')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
+                        <i class="fa-solid fa-tags w-4"></i> Promociones
+                    </button>
+                    <button onclick="switchAdminTab('disponibilidad')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
+                        <i class="fa-solid fa-chart-simple w-4"></i> Disponibilidad
+                    </button>
+
+                    <span class="text-slate-500 font-bold uppercase tracking-wider px-3 block mt-6 mb-2 text-[10px]">Análisis y Auditoría</span>
+                    <button onclick="switchAdminTab('reportes')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
+                        <i class="fa-solid fa-file-invoice-dollar w-4"></i> Reportes
+                    </button>
+                    <button onclick="switchAdminTab('facturacion')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
+                        <i class="fa-solid fa-receipt w-4"></i> Boletas y facturas
+                    </button>
+                    <button onclick="switchAdminTab('historial')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
+                        <i class="fa-solid fa-shield-halved w-4"></i> Historial Audit
+                    </button>
+                </nav>
+            </div>
+
+            <div class="p-4 border-t border-slate-800">
+                <div class="flex items-center justify-between text-xs text-slate-400">
+                    <div>
+                        <span class="block font-bold text-white">Admin General</span>
+                        <span class="text-[10px] text-emerald-400">● En línea</span>
+                    </div>
+                    <button onclick="signOut()" class="text-slate-500 hover:text-rose-400">
+                        <i class="fa-solid fa-power-off text-sm"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- CONTENIDO ADMIN -->
+        <main class="flex-1 p-6 space-y-6 overflow-y-auto">
+            
+            <!-- ENCABEZADO SUPERIOR -->
+            <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+                <div>
+                    <h1 class="text-2xl font-black text-white">Panel de Administración</h1>
+                    <p class="text-xs text-slate-400 mt-0.5">Control de reservas y operaciones - Orquídea Tour Perú</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="bg-slate-800 text-slate-300 text-xs px-3 py-1.5 rounded-xl border border-slate-700">
+                        <i class="fa-solid fa-calendar mr-1"></i> Sep 30, 2026
+                    </span>
+                    <button onclick="switchView('landing')" class="bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl shadow transition">
+                        Ver Sitio
+                    </button>
+                </div>
+            </div>
+
+            <label class="sr-only" for="admin-mobile-nav">Sección del panel administrativo</label>
+            <select id="admin-mobile-nav" onchange="switchAdminTab(this.value)" class="md:hidden w-full bg-slate-800 border border-slate-700 px-3 py-2.5 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+                <option value="dash">Dashboard</option>
+                <option value="reservas">Control Reservas</option>
+                <option value="ventas">Ventas</option>
+                <option value="clientes">Clientes</option>
+                <option value="paquetes">Paquetes</option>
+                <option value="promociones">Promociones</option>
+                <option value="disponibilidad">Disponibilidad</option>
+                <option value="reportes">Reportes</option>
+                <option value="facturacion">Boletas y facturas</option>
+                <option value="historial">Historial Audit</option>
+            </select>
+
+            <!-- SECCIÓN 1: DASHBOARD DE MÉTRICAS -->
+            <div id="admin-tab-dash" class="space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-white">Resumen operativo</h2>
+                        <p class="text-xs text-slate-400">Indicadores basados en las reservas registradas.</p>
+                    </div>
+                    <label class="flex items-center gap-2 text-xs text-slate-400">
+                        Año
+                        <select id="admin-dashboard-year" onchange="renderAdminDashboard()" class="bg-slate-800 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="">Todos</option>
+                        </select>
+                    </label>
+                </div>
+
+                <!-- METRIC CARDS -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
+                    <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-md">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-slate-400 text-xs font-bold uppercase">Clientes</span>
+                                <h3 id="admin-metric-clients" class="text-3xl font-black text-white mt-1">0</h3>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                        </div>
+                        <span class="text-slate-400 text-[11px] font-bold inline-block mt-3">Con reservas registradas</span>
+                    </div>
+
+                    <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-md">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-slate-400 text-xs font-bold uppercase">Paquetes reservados</span>
+                                <h3 id="admin-metric-packages" class="text-3xl font-black text-white mt-1">0</h3>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-brand-500/10 text-brand-400 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-cubes"></i>
+                            </div>
+                        </div>
+                        <span class="text-slate-400 text-[11px] font-bold inline-block mt-3">En el período seleccionado</span>
+                    </div>
+
+                    <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-md">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-slate-400 text-xs font-bold uppercase">Reservas Pendientes</span>
+                                <h3 id="admin-metric-pending" class="text-3xl font-black text-amber-400 mt-1">0</h3>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                        </div>
+                        <span class="text-amber-400 text-[11px] font-bold inline-block mt-3"><i class="fa-solid fa-triangle-exclamation"></i> Requieren revisión</span>
+                    </div>
+
+                    <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-md">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-slate-400 text-xs font-bold uppercase">Ingresos confirmados</span>
+                                <h3 id="admin-metric-revenue" class="text-xl font-black text-emerald-400 mt-2">S/ 0</h3>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+                        </div>
+                        <span class="text-slate-400 text-[11px] font-bold inline-block mt-3">Total de reservas confirmadas</span>
+                    </div>
+                    <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-md">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-slate-400 text-xs font-bold uppercase">Total reservas</span>
+                                <h3 id="admin-metric-bookings" class="text-3xl font-black text-white mt-1">0</h3>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-ticket"></i>
+                            </div>
+                        </div>
+                        <button type="button" onclick="switchAdminTab('reservas')" class="text-sky-300 hover:text-white text-[11px] font-bold inline-block mt-3">Abrir control de reservas <i class="fa-solid fa-arrow-right ml-1"></i></button>
+                    </div>
+                </div>
+
+                <!-- GRÁFICOS INTERACTIVOS -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 lg:col-span-2">
+                        <h4 class="font-bold text-sm text-white mb-4">Reservas por mes</h4>
+                        <div class="h-64">
+                            <canvas id="chartReservasMes"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700">
+                        <h4 class="font-bold text-sm text-white mb-4">Distribución por Estado</h4>
+                        <div class="h-64 flex items-center justify-center">
+                            <canvas id="chartEstadoReservas"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="bg-slate-800 p-4 sm:p-5 rounded-2xl border border-slate-700">
+                    <div class="flex items-center justify-between gap-3 mb-4">
+                        <div>
+                            <h3 class="font-bold text-sm text-white">Reservas recientes</h3>
+                            <p class="text-xs text-slate-400 mt-1">Últimos registros del período seleccionado.</p>
+                        </div>
+                        <button type="button" onclick="switchAdminTab('reservas')" class="shrink-0 text-brand-400 hover:text-white text-xs font-bold">Ver todas</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[620px] text-left text-xs text-slate-300">
+                            <thead class="bg-slate-900 text-slate-400 font-bold uppercase">
+                                <tr><th class="p-3">Código</th><th class="p-3">Cliente</th><th class="p-3">Paquete</th><th class="p-3">Fecha</th><th class="p-3">Estado</th></tr>
+                            </thead>
+                            <tbody id="admin-recent-bookings" class="divide-y divide-slate-700/50"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- SECCIÓN 2: CONTROL DE RESERVAS -->
+            <div id="admin-tab-reservas" class="hidden space-y-4">
+                <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-md">
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+                        <h3 class="font-extrabold text-lg text-white">Gestión y Control de Reservas</h3>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <input id="admin-booking-search" type="search" placeholder="Buscar por código, cliente..." oninput="renderBookings()" class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl text-xs text-white focus:outline-none w-full sm:w-64">
+                            <select id="admin-booking-status" onchange="renderBookings()" class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl text-xs text-white focus:outline-none">
+                                <option value="">Todos los Estados</option>
+                                <option value="PENDIENTE">PENDIENTE</option>
+                                <option value="CONFIRMADA">CONFIRMADA</option>
+                                <option value="CANCELADA">CANCELADA / RECHAZADA</option>
+                                <option value="FINALIZADA">FINALIZADA</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-slate-900 text-slate-400 font-bold uppercase border-b border-slate-700">
+                                <tr>
+                                    <th class="p-3">Código</th>
+                                    <th class="p-3">Cliente</th>
+                                    <th class="p-3">Paquete</th>
+                                    <th class="p-3">Fecha Viaje</th>
+                                    <th class="p-3">Pers.</th>
+                                    <th class="p-3">Total</th>
+                                    <th class="p-3">Estado</th>
+                                    <th class="p-3 text-right">Acciones de Control</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-bookings-body" class="divide-y divide-slate-700/50">
+                                <tr class="hover:bg-slate-700/30">
+                                    <td class="p-3 font-mono font-bold text-brand-400">RES-000125</td>
+                                    <td class="p-3 font-semibold text-white">Hugo Sánchez</td>
+                                    <td class="p-3">Experiencia Machu Picchu</td>
+                                    <td class="p-3">15/10/2026</td>
+                                    <td class="p-3">3</td>
+                                    <td class="p-3 font-bold text-white">S/ 2,040</td>
+                                    <td class="p-3" id="status-badge-125"><span class="bg-amber-500/20 text-amber-300 font-bold px-2 py-0.5 rounded text-[10px]">PENDIENTE</span></td>
+                                    <td class="p-3 text-right space-x-2">
+                                        <button onclick="adminConfirmBooking('RES-000125')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1 rounded text-[10px] transition">
+                                            Confirmar
+                                        </button>
+                                        <button onclick="adminRejectBooking('RES-000125')" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-2.5 py-1 rounded text-[10px] transition">
+                                            Cancelar
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-700/30">
+                                    <td class="p-3 font-mono font-bold text-brand-400">RES-000124</td>
+                                    <td class="p-3 font-semibold text-white">María López</td>
+                                    <td class="p-3">Paracas & Huacachina</td>
+                                    <td class="p-3">10/10/2026</td>
+                                    <td class="p-3">2</td>
+                                    <td class="p-3 font-bold text-white">S/ 640</td>
+                                    <td class="p-3"><span class="bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded text-[10px]">CONFIRMADA</span></td>
+                                    <td class="p-3 text-right">
+                                        <span class="text-slate-500 italic text-[10px]">Sin acciones pendientes</span>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-700/30">
+                                    <td class="p-3 font-mono font-bold text-brand-400">RES-000123</td>
+                                    <td class="p-3 font-semibold text-white">Carlos Ramírez</td>
+                                    <td class="p-3">Ruta del Colca Místico</td>
+                                    <td class="p-3">05/10/2026</td>
+                                    <td class="p-3">1</td>
+                                    <td class="p-3 font-bold text-white">S/ 450</td>
+                                    <td class="p-3"><span class="bg-sky-500/20 text-sky-300 font-bold px-2 py-0.5 rounded text-[10px]">FINALIZADA</span></td>
+                                    <td class="p-3 text-right">
+                                        <span class="text-slate-500 italic text-[10px]">Completada</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 3: CONTROL DE DISPONIBILIDAD -->
+            <div id="admin-tab-disponibilidad" class="hidden space-y-4">
+                <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                    <h3 class="font-extrabold text-lg text-white mb-2">Control de Disponibilidad y Cupos</h3>
+                    <p class="text-xs text-slate-400 mb-6">Monitoreo en tiempo real de vacantes ocupadas y disponibles por paquete turístico.</p>
+
+                    <div class="space-y-6 max-w-3xl">
+                        <!-- BARRA DISPONIBILIDAD 1 -->
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                            <div class="flex justify-between items-center text-xs mb-2">
+                                <span class="font-bold text-white">Experiencia Machu Picchu</span>
+                                <span class="text-emerald-400 font-mono font-bold">12 / 20 Cupos Ocupados (60%)</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden">
+                                <div class="bg-brand-500 h-full rounded-full" style="width: 60%"></div>
+                            </div>
+                            <div class="flex justify-between text-[10px] text-slate-500 mt-2">
+                                <span>Capacidad total: 20 personas</span>
+                                <span class="text-emerald-400 font-bold">8 Cupos libres</span>
+                            </div>
+                        </div>
+
+                        <!-- BARRA DISPONIBILIDAD 2 -->
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                            <div class="flex justify-between items-center text-xs mb-2">
+                                <span class="font-bold text-white">Paracas & Huacachina</span>
+                                <span class="text-amber-400 font-mono font-bold">22 / 30 Cupos Ocupados (73%)</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden">
+                                <div class="bg-amber-500 h-full rounded-full" style="width: 73%"></div>
+                            </div>
+                            <div class="flex justify-between text-[10px] text-slate-500 mt-2">
+                                <span>Capacidad total: 30 personas</span>
+                                <span class="text-amber-400 font-bold">8 Cupos libres</span>
+                            </div>
+                        </div>
+
+                        <!-- BARRA DISPONIBILIDAD 3 -->
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                            <div class="flex justify-between items-center text-xs mb-2">
+                                <span class="font-bold text-white">Ruta del Colca Místico</span>
+                                <span class="text-rose-400 font-mono font-bold">11 / 15 Cupos Ocupados (73%)</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden">
+                                <div class="bg-rose-500 h-full rounded-full" style="width: 73%"></div>
+                            </div>
+                            <div class="flex justify-between text-[10px] text-slate-500 mt-2">
+                                <span>Capacidad total: 15 personas</span>
+                                <span class="text-rose-400 font-bold">4 Cupos libres (Crítico)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="admin-tab-clientes" class="hidden space-y-4">
+                <section class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                    <h3 class="font-extrabold text-lg text-white mb-4">Clientes con reservas</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-slate-900 text-slate-400 font-bold uppercase"><tr><th class="p-3">Cliente</th><th class="p-3">Correo</th><th class="p-3">Reservas</th><th class="p-3">Total reservado</th></tr></thead>
+                            <tbody id="admin-clients-body" class="divide-y divide-slate-700/50"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <div id="admin-tab-paquetes" class="hidden space-y-4">
+                <section class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                    <h3 class="font-extrabold text-lg text-white mb-4">Catálogo de paquetes</h3>
+                    <form id="admin-package-form" onsubmit="event.preventDefault(); savePackage(this);" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
+                        <input name="packageId" type="hidden">
+                        <label class="text-xs text-slate-300">Nombre<input name="name" required class="mt-1 w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white"></label>
+                        <label class="text-xs text-slate-300">Destino<input name="destination" required class="mt-1 w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white"></label>
+                        <label class="text-xs text-slate-300">Duración<input name="duration" required placeholder="3 días / 2 noches" class="mt-1 w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white"></label>
+                        <label class="text-xs text-slate-300">Precio por persona (S/)<input name="price" type="number" min="1" step="0.01" required class="mt-1 w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white"></label>
+                        <label class="text-xs text-slate-300">Cupos disponibles<input name="stock" type="number" min="0" required class="mt-1 w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white"></label>
+                        <div class="sm:col-span-2 xl:col-span-3 grid grid-cols-1 sm:grid-cols-[180px_1fr] gap-4 items-center rounded-xl border border-slate-700 bg-slate-900/60 p-4">
+                            <div class="aspect-[4/3] overflow-hidden rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center"><img id="admin-package-image-preview" class="hidden w-full h-full object-cover" alt="Vista previa del paquete"><span id="admin-package-image-placeholder" class="text-slate-500 text-xs text-center px-3"><i class="fa-solid fa-image block text-2xl mb-2"></i>Vista previa de la foto</span></div>
+                            <div><label for="admin-package-image" class="inline-flex items-center gap-2 cursor-pointer bg-slate-700 hover:bg-slate-600 text-white text-sm font-bold px-4 py-2.5 rounded-lg"><i class="fa-solid fa-upload"></i>Subir foto del paquete</label><input id="admin-package-image" name="packageImage" type="file" accept="image/jpeg,image/png,image/webp" onchange="handlePackageImageUpload(this)" class="sr-only"><p class="text-xs text-slate-400 mt-2">Solo archivos JPG, PNG o WEBP. Máximo 1.5 MB. No se aceptan enlaces.</p></div>
+                        </div>
+                        <label class="text-xs text-slate-300 sm:col-span-2 xl:col-span-3">Descripción del paquete<textarea name="description" rows="2" required class="mt-1 w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white"></textarea></label>
+                        <label class="text-xs text-slate-300">Servicios incluidos<textarea name="includes" rows="4" placeholder="Guía turístico&#10;Transporte&#10;Entradas" required class="mt-1 w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white"></textarea><span class="block text-slate-500 mt-1">Un servicio por línea.</span></label>
+                        <label class="text-xs text-slate-300">No incluye<textarea name="excludes" rows="4" placeholder="Alimentación no indicada&#10;Gastos personales" class="mt-1 w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white"></textarea><span class="block text-slate-500 mt-1">Un servicio por línea. Opcional si no hay exclusiones.</span></label>
+                        <label class="flex items-center gap-2 text-xs text-slate-300"><input name="active" type="checkbox" checked class="rounded border-slate-600 text-brand-600 focus:ring-brand-500"> Publicar paquete</label>
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-end gap-2"><button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm px-4 py-2.5 rounded-lg"><i class="fa-solid fa-floppy-disk mr-2"></i>Guardar paquete</button><button type="button" onclick="resetPackageForm()" class="border border-slate-600 text-slate-300 font-semibold text-sm px-4 py-2.5 rounded-lg">Limpiar</button></div>
+                    </form>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-slate-900 text-slate-400 font-bold uppercase"><tr><th class="p-3">Foto</th><th class="p-3">Paquete</th><th class="p-3">Destino</th><th class="p-3">Precio</th><th class="p-3">Cupos</th><th class="p-3">Estado</th><th class="p-3 text-right">Acciones</th></tr></thead>
+                            <tbody id="admin-packages-body" class="divide-y divide-slate-700/50"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <div id="admin-tab-ventas" class="hidden space-y-4">
+                <section class="bg-slate-800 p-5 sm:p-6 rounded-2xl border border-slate-700">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+                        <div><h3 class="font-extrabold text-lg text-white">Ventas confirmadas</h3><p class="text-xs text-slate-400 mt-1">Solo se contabilizan reservas aprobadas.</p></div>
+                        <div class="text-left sm:text-right"><span class="block text-xs text-slate-400">Total vendido</span><strong id="admin-sales-total" class="text-2xl text-emerald-400">S/ 0</strong></div>
+                    </div>
+                    <div class="overflow-x-auto"><table class="w-full min-w-[640px] text-left text-xs text-slate-300"><thead class="bg-slate-900 text-slate-400 uppercase"><tr><th class="p-3">Reserva</th><th class="p-3">Cliente</th><th class="p-3">Paquete</th><th class="p-3">Fecha</th><th class="p-3">Pasajeros</th><th class="p-3">Venta</th></tr></thead><tbody id="admin-sales-body" class="divide-y divide-slate-700/50"></tbody></table></div>
+                </section>
+            </div>
+
+            <div id="admin-tab-promociones" class="hidden space-y-4">
+                <section class="bg-slate-800 p-5 sm:p-6 rounded-2xl border border-slate-700">
+                    <h3 class="font-extrabold text-lg text-white mb-4">Crear promoción</h3>
+                    <form onsubmit="event.preventDefault(); savePromotion(this);" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+                        <label class="text-xs text-slate-300">Paquete<select name="packageId" id="promotion-package" required class="mt-1 w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white"></select></label>
+                        <label class="text-xs text-slate-300">Nombre de promoción<input name="title" required placeholder="Temporada de aventura" class="mt-1 w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white"></label>
+                        <label class="text-xs text-slate-300">Descuento (%)<input name="discount" type="number" min="1" max="80" required class="mt-1 w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white"></label>
+                        <label class="text-xs text-slate-300">Válida hasta<input name="endsOn" type="date" required class="mt-1 w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white"></label>
+                        <div class="sm:col-span-2 xl:col-span-4"><button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm px-4 py-2.5 rounded-lg">Publicar promoción</button></div>
+                    </form>
+                </section>
+                <section class="bg-slate-800 p-5 sm:p-6 rounded-2xl border border-slate-700"><h3 class="font-bold text-white mb-4">Promociones publicadas</h3><div id="admin-promotions-list" class="divide-y divide-slate-700"></div></section>
+            </div>
+
+            <div id="admin-tab-facturacion" class="hidden space-y-4">
+                <section class="bg-slate-800 p-5 sm:p-6 rounded-2xl border border-slate-700">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"><div><h3 class="font-extrabold text-lg text-white">Emitir comprobante interno</h3><p class="text-xs text-amber-300 mt-1">No reemplaza una boleta/factura electrónica autorizada por SUNAT.</p></div><button type="button" onclick="window.location.href = appPagePath('boletas.html')" class="border border-slate-600 text-slate-200 text-xs font-bold px-3 py-2 rounded-lg">Ver boletas emitidas</button></div>
+                    <form id="invoice-form" onsubmit="event.preventDefault(); generateInvoice(this);" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-3xl">
+                        <label class="text-xs text-slate-300">Reserva confirmada<select name="bookingCode" id="invoice-booking" required class="mt-1 w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white"></select></label>
+                        <label class="text-xs text-slate-300">Tipo de comprobante<select name="type" id="invoice-type" onchange="toggleInvoiceFields()" class="mt-1 w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white"><option value="BOLETA">Boleta</option><option value="FACTURA">Factura</option></select></label>
+                        <div class="sm:col-span-2 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2 items-end">
+                            <label id="invoice-document-label" for="invoice-buyer-document" class="text-xs text-slate-300">DNI del cliente (8 dígitos)<input id="invoice-buyer-document" name="buyerDocument" inputmode="numeric" autocomplete="off" maxlength="8" pattern="[0-9]{8}" oninput="autoLookupInvoiceDocument()" required class="mt-1 w-full bg-slate-900 border border-slate-700 px-3 py-2.5 rounded-lg text-sm text-white"></label>
+                            <button type="button" onclick="lookupInvoiceDocument()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-2.5 rounded-lg"><i class="fa-solid fa-magnifying-glass mr-2"></i>Buscar datos</button>
+                            <p id="invoice-lookup-message" class="hidden sm:col-span-2 text-xs" role="status" aria-live="polite"></p>
+                        </div>
+                        <label id="invoice-buyer-name-field" class="text-xs text-slate-300">Nombre del cliente<input name="buyerName" required class="mt-1 w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white"></label>
+                        <label id="invoice-business-name-field" class="hidden text-xs text-slate-300">Razón social<input name="businessName" class="mt-1 w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-sm text-white"></label>
+                        <div class="sm:col-span-2"><button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm px-4 py-2.5 rounded-lg"><i class="fa-solid fa-file-circle-check mr-2"></i>Emitir comprobante</button></div>
+                    </form>
+                </section>
+                <section class="bg-slate-800 p-5 sm:p-6 rounded-2xl border border-slate-700"><h3 class="font-bold text-white mb-4">Boletas y facturas emitidas</h3><div class="overflow-x-auto"><table class="w-full min-w-[640px] text-left text-xs text-slate-300"><thead class="bg-slate-900 text-slate-400 uppercase"><tr><th class="p-3">Número</th><th class="p-3">Tipo</th><th class="p-3">Cliente</th><th class="p-3">Reserva</th><th class="p-3">Fecha</th><th class="p-3">Total</th><th class="p-3 text-right">Descarga</th></tr></thead><tbody id="admin-invoices-body" class="divide-y divide-slate-700/50"></tbody></table></div></section>
+            </div>
+
+            <div id="admin-tab-reportes" class="hidden space-y-4">
+                <section class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                    <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+                        <div><h3 class="font-extrabold text-lg text-white">Reporte de reservas</h3><p class="text-xs text-slate-400">Descarga los registros guardados en este navegador.</p></div>
+                        <button onclick="exportBookingsCsv()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs px-4 py-2 rounded-lg"><i class="fa-solid fa-download mr-2"></i>Exportar CSV</button>
+                    </div>
+                    <div id="report-summary" class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm"></div>
+                </section>
+            </div>
+
+            <!-- SECCIÓN 4: HISTORIAL Y AUDITORÍA DE OPERACIONES -->
+            <div id="admin-tab-historial" class="hidden space-y-4">
+                <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                    <h3 class="font-extrabold text-lg text-white mb-4">Historial de Operaciones y Auditoría del Sistema</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-slate-900 text-slate-400 font-bold uppercase border-b border-slate-700">
+                                <tr>
+                                    <th class="p-3">Usuario / Rol</th>
+                                    <th class="p-3">Acción Realizada</th>
+                                    <th class="p-3">Módulo</th>
+                                    <th class="p-3">Registro</th>
+                                    <th class="p-3">Fecha y Hora</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-700/50 font-mono text-[11px]">
+                                <tr>
+                                    <td class="p-3 text-white">Administrador General</td>
+                                    <td class="p-3 text-emerald-400">Confirmó estado de reserva</td>
+                                    <td class="p-3">Reservas</td>
+                                    <td class="p-3 text-brand-400">RES-000124</td>
+                                    <td class="p-3 text-slate-400">30/09/2026 15:30:12</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 text-sky-400">Hugo Sánchez (Cliente)</td>
+                                    <td class="p-3 text-amber-400">Registró solicitud de reserva</td>
+                                    <td class="p-3">Reservas</td>
+                                    <td class="p-3 text-brand-400">RES-000125</td>
+                                    <td class="p-3 text-slate-400">30/09/2026 14:20:05</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 text-white">Administrador General</td>
+                                    <td class="p-3 text-sky-400">Actualizó disponibilidad de paquete</td>
+                                    <td class="p-3">Paquetes</td>
+                                    <td class="p-3 text-brand-400">PAQ-CUSCO-01</td>
+                                    <td class="p-3 text-slate-400">30/09/2026 10:15:44</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../config/supabase-config.js"></script>
+    <script src="../config/app-config.js"></script>
+    <script src="../js/supabase-data.js"></script>
+    <script src="../js/app.js"></script>
+</body>
+</html>

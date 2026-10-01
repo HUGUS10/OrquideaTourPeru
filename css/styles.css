@@ -1,0 +1,32 @@
+.gradient-hero {
+/* Fondos */
+  background: linear-gradient(rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.75)), url('https://images.unsplash.com/photo-1526392060635-9d6019884377?q=80&w=1920&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;}
+
+.glass-card {
+/* Fondos */
+  background: rgba(255, 255, 255, 0.95);
+
+  /* Otras propiedades */
+  backdrop-filter: blur(10px);}
+
+::-webkit-scrollbar {
+/* Dimensiones */
+  width: 8px;
+  height: 8px;}
+
+::-webkit-scrollbar-track {
+/* Fondos */
+  background: #f1f5f9;}
+
+::-webkit-scrollbar-thumb {
+/* Bordes */
+  border-radius: 4px;
+
+  /* Fondos */
+  background: #cbd5e1;}
+
+::-webkit-scrollbar-thumb:hover {
+/* Fondos */
+  background: #94a3b8;}

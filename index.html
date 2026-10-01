@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orquídea Tour Perú | Sistema Web de Registro y Control de Reservas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="./config/tailwind-config.js"></script>
+    <link rel="stylesheet" href="./css/styles.css">
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head><body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-500 selection:text-white"><div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div><div id="auth-gate" class="hidden fixed inset-0 z-[100] bg-slate-950/30 backdrop-blur-sm flex items-center justify-center p-4"><section role="dialog" aria-modal="true" aria-labelledby="auth-gate-title" class="relative w-full max-w-md bg-white border border-slate-200 rounded-2xl shadow-xl p-6 sm:p-8 text-center"><button type="button" onclick="dismissAuthGate()" aria-label="Continuar como invitado" title="Continuar como invitado" class="absolute top-3 right-3 w-10 h-10 rounded-lg text-slate-500 hover:bg-slate-100 flex items-center justify-center"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button><img src="./img/logo.png" alt="Orquídea Tour Perú" class="w-20 h-20 object-contain mx-auto"><p class="text-xs font-bold uppercase tracking-widest text-brand-700 mt-4">Orquídea Tour Perú</p><h1 id="auth-gate-title" class="text-2xl sm:text-3xl font-black text-slate-900 mt-2">Explora el Perú a tu manera</h1><p class="text-sm text-slate-600 mt-3">Inicia sesión para continuar o crea una cuenta para gestionar tus viajes y reservas.</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-7"><a href="html/login.html" class="rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-4 transition">Iniciar sesión</a><a href="html/registro.html" class="rounded-lg border border-brand-600 text-brand-800 hover:bg-brand-50 font-bold py-3 px-4 transition">Registrarme</a></div></section></div><div id="view-landing" class="block">
+        
+        <!-- HEADER / NAVBAR -->
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-20 py-3 flex flex-wrap justify-between items-center gap-y-2">
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('landing')">
+                    <div class="w-10 h-10 rounded-xl bg-white border border-brand-100 flex items-center justify-center shadow-sm overflow-hidden">
+                        <img src="./img/logo.png" alt="Orquídea Tour Perú" class="w-full h-full object-contain">
+                    </div>
+                    <div>
+                        <span class="text-xl font-extrabold tracking-tight text-slate-900 block leading-none">ORQUÍDEA</span>
+                        <span class="text-xs font-semibold tracking-widest text-brand-600 uppercase">Tour Perú</span>
+                    </div>
+                </div>
+
+                <button id="mobile-menu-toggle" type="button" onclick="toggleMobileMenu()" aria-expanded="false" aria-controls="mobile-menu" aria-label="Abrir menú" class="md:hidden w-10 h-10 rounded-lg border border-slate-200 text-slate-700 flex items-center justify-center">
+                    <i class="fa-solid fa-bars" aria-hidden="true"></i>
+                </button>
+
+                <nav class="hidden md:flex items-center space-x-8 font-medium text-slate-600">
+                    <a href="#hero" class="hover:text-brand-600 transition">Inicio</a>
+                    <a href="#destinos" class="hover:text-brand-600 transition">Destinos</a>
+                    <a href="#paquetes" class="hover:text-brand-600 transition">Paquetes</a>
+                    <a href="#nosotros" class="hover:text-brand-600 transition">Nosotros</a>
+                </nav>
+
+                <div id="account-actions" class="hidden md:flex items-center space-x-3"></div>
+
+                <div id="mobile-menu" class="hidden md:hidden basis-full border-t border-slate-200 pt-3">
+                    <nav class="flex flex-col text-sm font-medium text-slate-700">
+                        <a href="#hero" onclick="closeMobileMenu()" class="px-3 py-2.5 hover:bg-slate-50 rounded-lg">Inicio</a>
+                        <a href="#destinos" onclick="closeMobileMenu()" class="px-3 py-2.5 hover:bg-slate-50 rounded-lg">Destinos</a>
+                        <a href="#paquetes" onclick="closeMobileMenu()" class="px-3 py-2.5 hover:bg-slate-50 rounded-lg">Paquetes</a>
+                        <a href="#nosotros" onclick="closeMobileMenu()" class="px-3 py-2.5 hover:bg-slate-50 rounded-lg">Nosotros</a>
+                    </nav>
+                    <div id="mobile-account-actions" class="flex flex-col gap-2 border-t border-slate-100 mt-2 pt-3"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- HERO SECTION -->
+        <section id="hero" class="gradient-hero min-h-[580px] flex items-center justify-center relative py-16 px-4">
+            <div class="max-w-5xl mx-auto text-center text-white z-10">
+                <span class="bg-white/10 backdrop-blur-md border border-white/20 text-brand-100 text-xs font-bold uppercase tracking-wider px-4 py-1.5 rounded-full inline-block mb-4">
+                    <i class="fa-solid fa-location-dot text-brand-500 mr-1"></i> La Agencia Turística N°1 del Perú
+                </span>
+                <h1 class="text-4xl sm:text-6xl font-black tracking-tight mb-6 leading-tight">
+                    Descubre el Perú,<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-100 via-emerald-300 to-teal-200">vive la experiencia</span>
+                </h1>
+                <p class="text-lg sm:text-xl text-slate-200 mb-8 max-w-2xl mx-auto font-light">
+                    Encuentra paquetes turísticos, consulta disponibilidad en tiempo real y realiza tus reservas de manera rápida, transparente y segura.
+                </p>
+
+                <!-- BARRA DE BÚSQUEDA FLOTANTE -->
+                <div class="glass-card rounded-2xl p-4 sm:p-6 shadow-2xl text-slate-800 max-w-4xl mx-auto text-left border border-white/40">
+                    <form onsubmit="event.preventDefault(); scrollToSection('paquetes');" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Destino</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-compass absolute left-3 top-3 text-slate-400"></i>
+                                <select class="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                    <option value="">¿A dónde deseas ir?</option>
+                                    <option value="cusco">Cusco & Machu Picchu</option>
+                                    <option value="arequipa">Arequipa & Colca</option>
+                                    <option value="ica">Ica, Paracas & Huacachina</option>
+                                    <option value="puno">Puno & Lago Titicaca</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Fecha</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-calendar-alt absolute left-3 top-3 text-slate-400"></i>
+                                <input type="date" value="2026-10-15" class="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Personas</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-user-group absolute left-3 top-3 text-slate-400"></i>
+                                <select class="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                    <option value="1">1 Persona</option>
+                                    <option value="2" selected>2 Personas</option>
+                                    <option value="3">3 Personas</option>
+                                    <option value="4">4+ Personas</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex items-end">
+                            <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 px-4 rounded-xl shadow-lg shadow-brand-600/30 transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-magnifying-glass"></i> Buscar Paquetes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN DESTINOS -->
+        <section id="destinos" class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <span class="text-brand-600 font-bold text-sm uppercase tracking-widest">Experiencias Inolvidables</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-1">Explora Nuestros Destinos</h2>
+                <p class="text-slate-600 mt-3">Selecciona uno de los maravillosos rincones del Perú y planifica tu próxima gran aventura.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Tarjeta Destino 1 -->
+                <div class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1">
+                    <img src="https://images.unsplash.com/photo-1526392060635-9d6019884377?q=80&w=600&auto=format&fit=crop" class="w-full h-80 object-cover group-hover:scale-110 transition duration-500" alt="Cusco">
+                    <div class="absolute inset-0 background: linear-gradient(to top, rgba(0,0,0,0.85), transparent)"></div>
+                    <div class="absolute bottom-0 p-6 text-white">
+                        <span class="bg-brand-500/80 text-white text-xs font-bold px-2.5 py-1 rounded-md">Sierra Sur</span>
+                        <h3 class="text-2xl font-bold mt-2">Cusco & Machu Picchu</h3>
+                        <p class="text-xs text-slate-300 mt-1 line-clamp-2">Capital histórica del Imperio Inca. Explora ciudadelas ancestrales y la maravilla del mundo.</p>
+                        <button onclick="scrollToSection('paquetes')" class="mt-4 text-xs font-bold uppercase tracking-wider text-brand-300 group-hover:text-white flex items-center gap-1 transition">
+                            Ver Paquetes <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tarjeta Destino 2 -->
+                <div class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1">
+                    <img src="https://images.unsplash.com/photo-1589553416260-f586c8f1514f?q=80&w=600&auto=format&fit=crop" class="w-full h-80 object-cover group-hover:scale-110 transition duration-500" alt="Arequipa">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent"></div>
+                    <div class="absolute bottom-0 p-6 text-white">
+                        <span class="bg-brand-500/80 text-white text-xs font-bold px-2.5 py-1 rounded-md">Sur Peruanos</span>
+                        <h3 class="text-2xl font-bold mt-2">Arequipa & Colca</h3>
+                        <p class="text-xs text-slate-300 mt-1 line-clamp-2">La Ciudad Blanca rodeada de imponentes volcanes y uno de los cañones más profundos.</p>
+                        <button onclick="scrollToSection('paquetes')" class="mt-4 text-xs font-bold uppercase tracking-wider text-brand-300 group-hover:text-white flex items-center gap-1 transition">
+                            Ver Paquetes <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tarjeta Destino 3 -->
+                <div class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1">
+                    <img src="https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=600&auto=format&fit=crop" class="w-full h-80 object-cover group-hover:scale-110 transition duration-500" alt="Huacachina">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent"></div>
+                    <div class="absolute bottom-0 p-6 text-white">
+                        <span class="bg-brand-500/80 text-white text-xs font-bold px-2.5 py-1 rounded-md">Costa Sur</span>
+                        <h3 class="text-2xl font-bold mt-2">Paracas & Huacachina</h3>
+                        <p class="text-xs text-slate-300 mt-1 line-clamp-2">Oasis rodeado de dunas espectaculares y reserva marina abundante en vida silvestre.</p>
+                        <button onclick="scrollToSection('paquetes')" class="mt-4 text-xs font-bold uppercase tracking-wider text-brand-300 group-hover:text-white flex items-center gap-1 transition">
+                            Ver Paquetes <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tarjeta Destino 4 -->
+                <div class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1">
+                    <img src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=600&auto=format&fit=crop" class="w-full h-80 object-cover group-hover:scale-110 transition duration-500" alt="Puno">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent"></div>
+                    <div class="absolute bottom-0 p-6 text-white">
+                        <span class="bg-brand-500/80 text-white text-xs font-bold px-2.5 py-1 rounded-md">Altiplano</span>
+                        <h3 class="text-2xl font-bold mt-2">Puno & Titicaca</h3>
+                        <p class="text-xs text-slate-300 mt-1 line-clamp-2">Navega por el lago navegable más alto del mundo y descubre las islas flotantes de los Uros.</p>
+                        <button onclick="scrollToSection('paquetes')" class="mt-4 text-xs font-bold uppercase tracking-wider text-brand-300 group-hover:text-white flex items-center gap-1 transition">
+                            Ver Paquetes <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN PAQUETES TURÍSTICOS -->
+        <section id="paquetes" class="py-20 bg-slate-100/70 border-y border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+                    <div>
+                        <span class="text-brand-600 font-bold text-sm uppercase tracking-widest">Opciones Disponibles</span>
+                        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-1">Paquetes Turísticos Destacados</h2>
+                    </div>
+                    <p class="text-slate-500 text-sm mt-2 md:mt-0">Precios actualizados en Soles Peruanos (S/) con disponibilidad garantizada.</p>
+                </div>
+
+                <div id="package-catalog" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- PAQUETE 1 -->
+                    <div class="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-md hover:shadow-xl transition flex flex-col">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1526392060635-9d6019884377?q=80&w=600&auto=format&fit=crop" class="w-full h-52 object-cover" alt="Machu Picchu">
+                            <span class="absolute top-4 right-4 bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow">
+                                <i class="fa-solid fa-circle text-[8px] mr-1"></i> 12 Cupos disponibles
+                            </span>
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-center text-xs text-slate-500 mb-2">
+                                    <span><i class="fa-solid fa-clock text-brand-600 mr-1"></i> 4 Días / 3 Noches</span>
+                                    <span><i class="fa-solid fa-location-dot text-brand-600 mr-1"></i> Cusco</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-2">Experiencia Machu Picchu</h3>
+                                <p class="text-slate-600 text-sm mb-4">Incluye tren expedición, boletos de ingreso a la ciudadela Inca, transporte de enlace y guiado profesional en español e inglés.</p>
+                            </div>
+                            <div>
+                                <div class="border-t border-slate-100 pt-4 flex justify-between items-center mb-4">
+                                    <div>
+                                        <span class="text-xs text-slate-400 block">Precio por persona</span>
+                                        <span class="text-2xl font-extrabold text-brand-700">S/ 680</span>
+                                    </div>
+                                    <button onclick="openPackageDetail('Experiencia Machu Picchu', 'Cusco – Machu Picchu', '4 Días / 3 Noches', 680, 12, 'https://images.unsplash.com/photo-1526392060635-9d6019884377?q=80&w=800&auto=format&fit=crop')" class="text-brand-600 hover:text-brand-700 font-bold text-sm flex items-center gap-1">
+                                        Ver detalles <i class="fa-solid fa-chevron-right text-xs"></i>
+                                    </button>
+                                </div>
+                                <button onclick="selectPackageForBooking('Experiencia Machu Picchu', 680, 12)" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-bookmark"></i> Reservar Ahora
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PAQUETE 2 -->
+                    <div class="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-md hover:shadow-xl transition flex flex-col">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=600&auto=format&fit=crop" class="w-full h-52 object-cover" alt="Paracas">
+                            <span class="absolute top-4 right-4 bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow">
+                                <i class="fa-solid fa-circle text-[8px] mr-1"></i> 8 Cupos disponibles
+                            </span>
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-center text-xs text-slate-500 mb-2">
+                                    <span><i class="fa-solid fa-clock text-brand-600 mr-1"></i> Full Day (1 Día)</span>
+                                    <span><i class="fa-solid fa-location-dot text-brand-600 mr-1"></i> Ica & Paracas</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-2">Paracas & Huacachina</h3>
+                                <p class="text-slate-600 text-sm mb-4">Paseo en deslizador marítimo a Islas Ballestas, aventura extrema en tubulares por las dunas de Ica y degustación de piscos tradicionales.</p>
+                            </div>
+                            <div>
+                                <div class="border-t border-slate-100 pt-4 flex justify-between items-center mb-4">
+                                    <div>
+                                        <span class="text-xs text-slate-400 block">Precio por persona</span>
+                                        <span class="text-2xl font-extrabold text-brand-700">S/ 320</span>
+                                    </div>
+                                    <button onclick="openPackageDetail('Paracas & Huacachina', 'Ica – Paracas', 'Full Day', 320, 8, 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=800&auto=format&fit=crop')" class="text-brand-600 hover:text-brand-700 font-bold text-sm flex items-center gap-1">
+                                        Ver detalles <i class="fa-solid fa-chevron-right text-xs"></i>
+                                    </button>
+                                </div>
+                                <button onclick="selectPackageForBooking('Paracas & Huacachina', 320, 8)" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-bookmark"></i> Reservar Ahora
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PAQUETE 3 -->
+                    <div class="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-md hover:shadow-xl transition flex flex-col">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1589553416260-f586c8f1514f?q=80&w=600&auto=format&fit=crop" class="w-full h-52 object-cover" alt="Colca">
+                            <span class="absolute top-4 right-4 bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow">
+                                <i class="fa-solid fa-circle text-[8px] mr-1"></i> ¡Pocos cupos! (4)
+                            </span>
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-center text-xs text-slate-500 mb-2">
+                                    <span><i class="fa-solid fa-clock text-brand-600 mr-1"></i> 3 Días / 2 Noches</span>
+                                    <span><i class="fa-solid fa-location-dot text-brand-600 mr-1"></i> Arequipa</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-2">Ruta del Colca Místico</h3>
+                                <p class="text-slate-600 text-sm mb-4">Arequipa colonial, mirador Cruz del Cóndor, baños termales de La Calera y pernocte en pintoresco poblado de Chivay.</p>
+                            </div>
+                            <div>
+                                <div class="border-t border-slate-100 pt-4 flex justify-between items-center mb-4">
+                                    <div>
+                                        <span class="text-xs text-slate-400 block">Precio por persona</span>
+                                        <span class="text-2xl font-extrabold text-brand-700">S/ 450</span>
+                                    </div>
+                                    <button onclick="openPackageDetail('Ruta del Colca Místico', 'Arequipa – Cañón del Colca', '3 Días / 2 Noches', 450, 4, 'https://images.unsplash.com/photo-1589553416260-f586c8f1514f?q=80&w=800&auto=format&fit=crop')" class="text-brand-600 hover:text-brand-700 font-bold text-sm flex items-center gap-1">
+                                        Ver detalles <i class="fa-solid fa-chevron-right text-xs"></i>
+                                    </button>
+                                </div>
+                                <button onclick="selectPackageForBooking('Ruta del Colca Místico', 450, 4)" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-bookmark"></i> Reservar Ahora
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="nosotros" class="py-16 sm:py-20 bg-white border-y border-slate-200 scroll-mt-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+                <div>
+                    <span class="text-brand-700 font-bold text-sm uppercase tracking-widest">Sobre la agencia</span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-2">Conoce Orquídea Tour Perú</h2>
+                    <p class="text-slate-600 leading-relaxed mt-4">Somos una agencia de viajes enfocada en acercarte a los destinos del Perú con información clara y opciones para distintos tipos de aventura. Desde Lima, te ayudamos a encontrar el paquete que mejor se ajuste a tu viaje.</p>
+                    <p class="text-slate-600 leading-relaxed mt-3">Puedes consultar disponibilidad, revisar los detalles de cada experiencia y enviar tu solicitud de reserva desde esta página.</p>
+                    <a href="https://wa.me/51989851245" class="inline-flex items-center gap-2 mt-6 bg-brand-600 hover:bg-brand-700 text-white font-bold px-5 py-3 rounded-lg transition"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Conversar con la agencia</a>
+                </div>
+                <div class="border-l-2 border-brand-500 pl-6 sm:pl-8 space-y-6">
+                    <div>
+                        <h3 class="font-bold text-slate-900">Destinos del Perú</h3>
+                        <p class="text-sm text-slate-600 mt-1">Experiencias en Cusco, Ica, Paracas, Arequipa y otros destinos.</p>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900">Atención directa</h3>
+                        <p class="text-sm text-slate-600 mt-1">Escríbenos por WhatsApp o correo para resolver tus consultas de viaje.</p>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900">Información de contacto</h3>
+                        <p class="text-sm text-slate-600 mt-1">Santa Anita, Lima · +51 989 851 245 · orquideatourperu@hotmail.com</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 text-white font-bold text-lg mb-3">
+                        <img src="./img/logo.png" alt="" class="w-7 h-7 object-contain">
+                        <span>ORQUÍDEA TOUR PERÚ</span>
+                    </div>
+                            <p class="text-xs text-slate-400 leading-relaxed">
+                                Agencia de viajes especializada en experiencias auténticas por los principales destinos del Perú.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-white text-sm font-bold uppercase mb-3">Navegación</h4>
+                    <ul class="text-xs space-y-2">
+                        <li><a href="#hero" class="hover:text-white transition">Inicio</a></li>
+                        <li><a href="#destinos" class="hover:text-white transition">Destinos</a></li>
+                        <li><a href="#paquetes" class="hover:text-white transition">Paquetes</a></li>
+                        <li><a href="#nosotros" class="hover:text-white transition">Nosotros</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white text-sm font-bold uppercase mb-3">Seguridad</h4>
+                    <ul class="text-xs space-y-2">
+                        <li><a href="#" class="hover:text-white transition">Términos y Condiciones</a></li>
+                        <li><a href="#" class="hover:text-white transition">Política de Privacidad</a></li>
+                        <li><a href="#" class="hover:text-white transition">Libro de Reclamaciones</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white text-sm font-bold uppercase mb-3">Contacto Directo</h4>
+                    <p class="text-xs mb-1"><i class="fa-solid fa-envelope mr-1 text-brand-500"></i> <a href="mailto:orquideatourperu@hotmail.com" class="hover:text-white">orquideatourperu@hotmail.com</a></p>
+                    <p class="text-xs mb-1"><i class="fa-solid fa-phone mr-1 text-brand-500"></i> <a href="tel:+51989851245" class="hover:text-white">+51 989 851 245</a></p>
+                    <p class="text-xs mb-1"><i class="fa-brands fa-whatsapp mr-1 text-brand-500"></i> <a href="https://wa.me/51989851245" class="hover:text-white">WhatsApp +51 989 851 245</a></p>
+                    <p class="text-xs"><i class="fa-solid fa-location-dot mr-1 text-brand-500"></i> P. 23 de Septiembre, Calle 8, Mz. D, Lt. 8, Santa Anita, Lima</p>
+                </div>
+            </div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
+                &copy; 2026 Orquídea Tour Perú. Todos los derechos reservados.
+            </div>
+        </footer>
+    </div><div id="modal-package-detail" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl relative border border-slate-200">
+            <button onclick="closeModal('modal-package-detail')" class="absolute top-4 right-4 bg-slate-900/50 hover:bg-slate-900 text-white w-8 h-8 rounded-full flex items-center justify-center z-10">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="relative h-64">
+                <img id="detail-img" src="" class="w-full h-full object-cover" alt="Detalle">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
+                <div class="absolute bottom-4 left-6 text-white">
+                    <span id="detail-destination" class="bg-brand-600 text-xs font-bold px-2.5 py-1 rounded"></span>
+                    <h2 id="detail-title" class="text-2xl font-black mt-1"></h2>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-3 gap-4 bg-slate-50 p-3 rounded-xl border border-slate-200 text-center mb-4">
+                    <div>
+                        <span class="text-[10px] text-slate-400 block font-bold uppercase">Duración</span>
+                        <span id="detail-duration" class="text-sm font-bold text-slate-700"></span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-slate-400 block font-bold uppercase">Precio</span>
+                        <span id="detail-price" class="text-sm font-extrabold text-brand-600"></span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-slate-400 block font-bold uppercase">Disponibilidad</span>
+                        <span id="detail-stock" class="text-sm font-bold text-emerald-600"></span>
+                    </div>
+                </div>
+
+                <h4 class="font-bold text-slate-900 text-sm mb-2">Servicios Incluidos</h4>
+                <div id="detail-includes" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-600 mb-4"></div>
+
+                <h4 class="font-bold text-slate-900 text-sm mb-2">No Incluye</h4>
+                <div id="detail-excludes" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-500 mb-6"></div>
+
+                <button id="btn-modal-reserve" onclick="" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl shadow-lg transition">
+                    Reservar Este Paquete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL INICIAR SESIÓN -->
+    <!-- ========================================== -->
+    <div id="modal-login" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 border border-slate-200 relative">
+            <button onclick="closeModal('modal-login')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 rounded-xl bg-white border border-brand-100 flex items-center justify-center mx-auto mb-2 overflow-hidden">
+                    <img src="./img/logo.png" alt="Orquídea Tour Perú" class="w-full h-full object-contain">
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900">Bienvenido nuevamente</h3>
+                <p class="text-xs text-slate-500 mt-1">Ingresa a tu cuenta para gestionar tus reservas</p>
+            </div>
+
+            <form onsubmit="event.preventDefault(); simulateLogin(this);" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Correo o usuario</label>
+                    <input name="username" type="text" autocomplete="username" placeholder="Tu correo o usuario" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Contraseña</label>
+                        <input name="password" type="password" autocomplete="current-password" placeholder="Tu contraseña" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                    <label class="flex items-center gap-2 cursor-pointer text-slate-600">
+                        <input type="checkbox" checked class="rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                        Recordarme
+                    </label>
+                    <a href="#" class="text-brand-600 hover:underline font-semibold">¿Olvidaste tu contraseña?</a>
+                </div>
+                <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl shadow-md transition">
+                    Iniciar Sesión
+                </button>
+            </form>
+
+            <div class="mt-6 pt-4 border-t border-slate-100 text-center text-xs text-slate-500">
+                ¿No tienes una cuenta aún? 
+                <button onclick="closeModal('modal-login'); openModal('modal-register');" class="text-brand-600 font-bold hover:underline">Regístrate aquí</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL REGISTRO DE USUARIO -->
+    <!-- ========================================== -->
+    <div id="modal-register" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl p-6 border border-slate-200 relative">
+            <button onclick="closeModal('modal-register')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div class="text-center mb-6">
+                <h3 class="text-2xl font-bold text-slate-900">Crear una cuenta</h3>
+                <p class="text-xs text-slate-500 mt-1">Regístrate para realizar y consultar tus reservas turísticas</p>
+            </div>
+
+            <form onsubmit="event.preventDefault(); simulateRegister(this);" class="space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nombres</label>
+                            <input name="firstName" type="text" placeholder="Hugo" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Apellidos</label>
+                            <input name="lastName" type="text" placeholder="Sánchez" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">DNI / Pasaporte</label>
+                            <input name="document" type="text" placeholder="74859612" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Teléfono</label>
+                            <input name="phone" type="tel" placeholder="987654321" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Correo Electrónico</label>
+                    <input name="email" type="email" placeholder="hugo.sanchez@ejemplo.pe" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Contraseña</label>
+                            <input name="password" type="password" placeholder="••••••••" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Confirmar</label>
+                            <input name="confirmPassword" type="password" placeholder="••••••••" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                </div>
+                <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600 pt-1">
+                    <input type="checkbox" required class="rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                    Acepto los términos, condiciones y políticas de privacidad
+                </label>
+                <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl shadow-md transition mt-2">
+                    Crear Cuenta
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL FORMULARIO DE RESERVA COMPLETO -->
+    <!-- ========================================== -->
+    <div id="modal-booking" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-xl w-full overflow-hidden shadow-2xl border border-slate-200 relative">
+            <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-check text-brand-500 text-xl"></i>
+                    <h3 class="font-bold text-lg">Proceso de Reserva de Paquete</h3>
+                </div>
+                <button onclick="closeModal('modal-booking')" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- PASO 1: FORMULARIO DE RESERVA -->
+            <div id="booking-step-1" class="p-6">
+                <div class="bg-brand-50 border border-brand-200 rounded-xl p-3 mb-4 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs text-brand-800 font-bold block" id="book-pkg-name">Paquete Seleccionado</span>
+                        <span class="text-xs text-brand-600" id="book-pkg-price-label">S/ 0 por persona</span>
+                    </div>
+                    <span id="book-availability-badge" class="bg-brand-200 text-brand-900 text-[10px] font-bold px-2 py-0.5 rounded">
+                        12 cupos disponibles
+                    </span>
+                </div>
+
+                <form onsubmit="event.preventDefault(); goToBookingStep2();" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Titular de Reserva</label>
+                            <input type="text" value="Hugo Sánchez" readonly class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">DNI / Documento</label>
+                            <input type="text" value="74859612" readonly class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Fecha de Viaje</label>
+                            <input type="date" id="book-date" value="2026-10-15" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Cantidad de Personas</label>
+                            <select id="book-passengers" onchange="calculateBookingTotal()" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <option value="1">1 Personas</option>
+                                <option value="2">2 Personas</option>
+                                <option value="3" selected>3 Personas</option>
+                                <option value="4">4 Personas</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- CÁLCULO DINÁMICO EN TIEMPO REAL -->
+                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-2">
+                        <div class="flex justify-between text-xs text-slate-600">
+                            <span>Precio base por persona:</span>
+                            <span id="calc-price-person">S/ 0</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-600">
+                            <span>Pasajeros calculados:</span>
+                            <span id="calc-passengers-count">3</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-amber-700 font-medium pt-1 border-t border-slate-200">
+                            <span>Proyección de cupos restantes:</span>
+                            <span id="calc-remaining-stock">9 cupos disponibles después de reservar</span>
+                        </div>
+                        <div class="flex justify-between text-base font-extrabold text-slate-900 pt-2 border-t border-slate-300">
+                            <span>Monto Total a Pagar:</span>
+                            <span id="calc-total" class="text-brand-700 text-xl">S/ 0</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                        Ver Resumen de Reserva <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- PASO 2: RESUMEN Y CONFIRMACIÓN -->
+            <div id="booking-step-2" class="p-6 hidden space-y-4">
+                <div class="text-center border-b border-slate-100 pb-3">
+                    <span class="text-xs font-bold text-brand-600 uppercase tracking-widest">Paso Final</span>
+                    <h4 class="text-xl font-bold text-slate-900">RESUMEN DE RESERVA</h4>
+                </div>
+
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between py-1 border-b border-slate-100">
+                        <span class="text-slate-500">Paquete Turístico:</span>
+                        <span class="font-bold text-slate-800" id="summary-pkg"></span>
+                    </div>
+                    <div class="flex justify-between py-1 border-b border-slate-100">
+                        <span class="text-slate-500">Fecha Programada:</span>
+                        <span class="font-bold text-slate-800" id="summary-date"></span>
+                    </div>
+                    <div class="flex justify-between py-1 border-b border-slate-100">
+                        <span class="text-slate-500">Cantidad de Pasajeros:</span>
+                        <span class="font-bold text-slate-800" id="summary-passengers"></span>
+                    </div>
+                    <div class="flex justify-between py-1 border-b border-slate-100">
+                        <span class="text-slate-500">Precio unitario:</span>
+                        <span class="font-bold text-slate-800" id="summary-unit-price"></span>
+                    </div>
+                    <div class="flex justify-between py-2 text-base font-extrabold bg-brand-50 px-3 rounded-lg text-brand-800">
+                        <span>Monto Total:</span>
+                        <span id="summary-total-price"></span>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button onclick="backToBookingStep1()" class="w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 rounded-xl transition">
+                        Atrás
+                    </button>
+                    <button onclick="confirmBookingFinal()" class="w-2/3 bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check"></i> Confirmar Solicitud
+                    </button>
+                </div>
+            </div>
+
+            <!-- PASO 3: CONFIRMACIÓN Y CÓDIGO -->
+            <div id="booking-step-3" class="p-6 text-center hidden space-y-4">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900">¡Reserva Registrada Correctamente!</h3>
+                <p class="text-xs text-slate-500">Su solicitud ha sido ingresada exitosamente en el sistema web de Orquídea Tour Perú.</p>
+                
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 max-w-xs mx-auto">
+                    <span class="text-[10px] uppercase font-bold text-slate-400 block">Código Generado</span>
+                    <span class="text-2xl font-black text-brand-700 tracking-wider">RES-000125</span>
+                    <div class="mt-2">
+                        <span class="inline-block bg-amber-100 text-amber-800 text-xs font-bold px-3 py-0.5 rounded-full">
+                            Estado: PENDIENTE
+                        </span>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex flex-col gap-2">
+                    <button onclick="closeModal('modal-booking'); switchView('client-panel');" class="bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow transition">
+                        Ir a Mi Panel de Cliente
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 2. PANEL DEL CLIENTE (DASHBOARD CLIENTE) -->
+    <!-- ========================================== -->
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./config/supabase-config.js"></script>
+    <script src="./config/app-config.js"></script>    <script src="./js/supabase-data.js"></script>
+    <script src="./js/app.js"></script>
+</body>
+</html>

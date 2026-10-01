@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis pasajes | Orquídea Tour Perú</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../config/tailwind-config.js"></script>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800">
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+    <header class="bg-white border-b border-slate-200">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-3">
+            <a href="admin_cliente.html" class="flex items-center gap-3 text-slate-900 font-extrabold"><img src="../img/logo.png" alt="" class="w-10 h-10 object-contain"><span>ORQUÍDEA TOUR PERÚ<small class="block text-xs text-brand-700 font-semibold">Mis pasajes</small></span></a>
+            <a href="admin_cliente.html" class="text-sm font-semibold text-slate-600 hover:text-brand-700"><i class="fa-solid fa-arrow-left mr-2"></i>Volver a mi cuenta</a>
+        </div>
+    </header>
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div class="mb-6"><h1 class="text-2xl sm:text-3xl font-black text-slate-900">Pasajes confirmados</h1><p class="text-sm text-slate-600 mt-2">Tus documentos de viaje están disponibles cuando la reserva queda confirmada.</p></div>
+        <div id="passages-list" class="space-y-3"></div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../config/supabase-config.js"></script>
+    <script src="../config/app-config.js"></script>    <script src="../js/supabase-data.js"></script>
+    <script src="../js/app.js"></script>
+</body>
+</html>
