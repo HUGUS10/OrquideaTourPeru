@@ -139,7 +139,10 @@
             imagePath: row.image_path,
             imageUrl: row.image_url,
             order: row.sort_order,
-            active: row.is_published
+            active: row.is_published,
+            tourUrl: row.tour_url || '',
+            tourIs360: Boolean(row.tour_is_360),
+            hasTourColumns: 'tour_url' in row
         };
     }
 
@@ -171,9 +174,21 @@
             is_published: destination.active,
             updated_at: new Date().toISOString()
         };
+        if (destination.hasTourColumns || destination.tourUrl) {
+            values.tour_url = destination.tourUrl || null;
+            values.tour_is_360 = Boolean(destination.tourIs360);
+        }
         if (destination.id) values.id = destination.id;
         const result = await client.from('destinations').upsert(values).select('*').single();
         return mapDestination(throwIfError(result));
+    }
+
+    async function uploadTourImage(userId, file) {
+        if (!['image/jpeg', 'image/webp'].includes(file.type)) throw new Error('La foto 360° debe ser JPG o WEBP.');
+        if (file.size > 15 * 1024 * 1024) throw new Error('La foto 360° no debe superar los 15 MB.');
+        const path = `${userId}/${crypto.randomUUID()}.${file.type === 'image/webp' ? 'webp' : 'jpg'}`;
+        throwIfError(await client.storage.from('tour-images').upload(path, file, { contentType: file.type, upsert: false }));
+        return client.storage.from('tour-images').getPublicUrl(path).data.publicUrl;
     }
 
     async function deleteDestination(destinationId) {
@@ -383,6 +398,7 @@
         loadDestinations,
         saveDestination,
         deleteDestination,
+        uploadTourImage,
         mapDestination,
         updateComplaint,
         submitComplaint

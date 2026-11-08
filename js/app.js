@@ -316,7 +316,7 @@
                         ${item.region ? `<span class="bg-brand-600/90 text-white text-xs font-bold px-2.5 py-1 rounded-md">${escapeHtml(item.region)}</span>` : ''}
                         <h3 class="text-xl sm:text-2xl font-bold mt-2">${escapeHtml(item.name)}</h3>
                         <p class="text-sm text-slate-200 mt-1 line-clamp-2">${escapeHtml(item.description)}</p>
-                        <button type="button" onclick="filterPackagesByDestination('${escapeHtml(item.slug)}')" class="mt-3 py-2 text-xs font-bold uppercase tracking-wider text-brand-200 hover:text-white group-hover:text-white flex items-center gap-1 transition">Ver Paquetes <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+                        <div class="mt-3 flex flex-wrap items-center gap-2"><button type="button" onclick="openVirtualTour('${escapeHtml(item.slug)}')" class="btn-360"><i class="fa-solid fa-street-view" aria-hidden="true"></i> ${item.tourIs360 ? 'Visita 360°' : 'Visita virtual'}</button><button type="button" onclick="filterPackagesByDestination('${escapeHtml(item.slug)}')" class="py-2 text-xs font-bold uppercase tracking-wider text-brand-200 hover:text-white group-hover:text-white flex items-center gap-1 transition">Ver Paquetes <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button></div>
                     </div>
                 </article>`).join('');
             grid.className = `grid grid-cols-1 sm:grid-cols-2 ${published.length >= 4 ? 'lg:grid-cols-4' : published.length === 3 ? 'lg:grid-cols-3' : ''} gap-5 sm:gap-6`;
@@ -353,6 +353,13 @@
                 const container = document.getElementById(id);
                 if (container) container.innerHTML = '<p class="text-slate-500">Consúltanos por WhatsApp para más detalles.</p>';
             });
+
+            const tourButton = document.getElementById('btn-modal-tour');
+            const tourSlug = typeof destinationForText === 'function' ? destinationForText(`${title} ${dest}`) : '';
+            if (tourButton) {
+                tourButton.hidden = !tourSlug;
+                tourButton.onclick = () => { closeModal('modal-package-detail'); openVirtualTour(tourSlug); };
+            }
 
             document.getElementById('btn-modal-reserve').onclick = function() {
                 closeModal('modal-package-detail');
@@ -1403,7 +1410,14 @@
             if (!session) {
                 if (!isPublicPage) window.location.replace('../index.html');
                 renderAccountControls();
-                window.setTimeout(() => gate?.classList.remove('hidden'), 5000);
+                window.setTimeout(() => {
+                    let alreadyShown = false;
+                    try { alreadyShown = sessionStorage.getItem('orquidea-gate-shown') === '1'; } catch (error) { /* sin almacenamiento */ }
+                    const busy = document.body.classList.contains('modal-open') || document.querySelector('#virtual-tour.is-open');
+                    if (alreadyShown || busy || !gate) return;
+                    gate.classList.remove('hidden');
+                    try { sessionStorage.setItem('orquidea-gate-shown', '1'); } catch (error) { /* sin almacenamiento */ }
+                }, 12000);
                 window.OrquideasStore.loadPublicCatalog().then(publicData => {
                     packages = publicData.packages;
                     promotions = publicData.promotions;

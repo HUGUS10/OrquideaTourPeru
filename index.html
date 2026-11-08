@@ -142,6 +142,11 @@
                     Encuentra paquetes turísticos, consulta disponibilidad en tiempo real y realiza tus reservas de manera rápida, transparente y segura.
                 </p>
 
+                <div class="flex flex-wrap justify-center gap-3 mb-8 -mt-2">
+                    <a href="#destinos" class="inline-flex items-center gap-2 rounded-full bg-white/15 hover:bg-white/25 border border-white/30 backdrop-blur px-5 py-2.5 text-sm font-bold transition"><i class="fa-solid fa-vr-cardboard" aria-hidden="true"></i> Recorre los destinos en 360°</a>
+                    <a href="#paquetes" class="inline-flex items-center gap-2 rounded-full bg-brand-600 hover:bg-brand-700 px-5 py-2.5 text-sm font-bold shadow-lg shadow-brand-900/30 transition"><i class="fa-solid fa-suitcase-rolling" aria-hidden="true"></i> Ver paquetes</a>
+                </div>
+
                 <!-- BARRA DE BÚSQUEDA FLOTANTE -->
                 <div class="glass-card rounded-2xl p-4 sm:p-6 shadow-2xl text-slate-800 max-w-4xl mx-auto text-left border border-white/40">
                     <form id="hero-search" onsubmit="event.preventDefault(); searchPackages(this);" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" role="search" aria-label="Buscar paquetes turísticos">
@@ -203,9 +208,9 @@
                         <span class="bg-brand-600/90 text-white text-xs font-bold px-2.5 py-1 rounded-md">Sierra Sur</span>
                         <h3 class="text-xl sm:text-2xl font-bold mt-2">Cusco & Machu Picchu</h3>
                         <p class="text-sm text-slate-200 mt-1 line-clamp-2">Capital histórica del Imperio Inca. Explora ciudadelas ancestrales y la maravilla del mundo.</p>
-                        <button type="button" onclick="filterPackagesByDestination('cusco')" class="mt-3 py-2 text-xs font-bold uppercase tracking-wider text-brand-200 hover:text-white group-hover:text-white flex items-center gap-1 transition">
+                        <div class="mt-3 flex flex-wrap items-center gap-2"><button type="button" onclick="openVirtualTour('cusco')" class="btn-360"><i class="fa-solid fa-street-view" aria-hidden="true"></i> Visita 360°</button><button type="button" onclick="filterPackagesByDestination('cusco')" class="py-2 text-xs font-bold uppercase tracking-wider text-brand-200 hover:text-white group-hover:text-white flex items-center gap-1 transition">
                             Ver Paquetes <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                        </button>
+                        </button></div>
                     </div>
                 </article>
 
@@ -216,9 +221,9 @@
                         <span class="bg-brand-600/90 text-white text-xs font-bold px-2.5 py-1 rounded-md">Sur del Perú</span>
                         <h3 class="text-xl sm:text-2xl font-bold mt-2">Arequipa & Colca</h3>
                         <p class="text-sm text-slate-200 mt-1 line-clamp-2">La Ciudad Blanca rodeada de imponentes volcanes y uno de los cañones más profundos.</p>
-                        <button type="button" onclick="filterPackagesByDestination('arequipa')" class="mt-3 py-2 text-xs font-bold uppercase tracking-wider text-brand-200 hover:text-white group-hover:text-white flex items-center gap-1 transition">
+                        <div class="mt-3 flex flex-wrap items-center gap-2"><button type="button" onclick="openVirtualTour('arequipa')" class="btn-360"><i class="fa-solid fa-street-view" aria-hidden="true"></i> Visita 360°</button><button type="button" onclick="filterPackagesByDestination('arequipa')" class="py-2 text-xs font-bold uppercase tracking-wider text-brand-200 hover:text-white group-hover:text-white flex items-center gap-1 transition">
                             Ver Paquetes <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                        </button>
+                        </button></div>
                     </div>
                 </article>
 
@@ -229,9 +234,9 @@
                         <span class="bg-brand-600/90 text-white text-xs font-bold px-2.5 py-1 rounded-md">Costa Sur</span>
                         <h3 class="text-xl sm:text-2xl font-bold mt-2">Paracas & Huacachina</h3>
                         <p class="text-sm text-slate-200 mt-1 line-clamp-2">Oasis rodeado de dunas espectaculares y reserva marina abundante en vida silvestre.</p>
-                        <button type="button" onclick="filterPackagesByDestination('ica')" class="mt-3 py-2 text-xs font-bold uppercase tracking-wider text-brand-200 hover:text-white group-hover:text-white flex items-center gap-1 transition">
+                        <div class="mt-3 flex flex-wrap items-center gap-2"><button type="button" onclick="openVirtualTour('ica')" class="btn-360"><i class="fa-solid fa-street-view" aria-hidden="true"></i> Visita 360°</button><button type="button" onclick="filterPackagesByDestination('ica')" class="py-2 text-xs font-bold uppercase tracking-wider text-brand-200 hover:text-white group-hover:text-white flex items-center gap-1 transition">
                             Ver Paquetes <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                        </button>
+                        </button></div>
                     </div>
                 </article>
 
@@ -242,9 +247,9 @@
                         <span class="bg-brand-600/90 text-white text-xs font-bold px-2.5 py-1 rounded-md">Altiplano</span>
                         <h3 class="text-xl sm:text-2xl font-bold mt-2">Puno & Titicaca</h3>
                         <p class="text-sm text-slate-200 mt-1 line-clamp-2">Navega por el lago navegable más alto del mundo y descubre las islas flotantes de los Uros.</p>
-                        <button type="button" onclick="filterPackagesByDestination('puno')" class="mt-3 py-2 text-xs font-bold uppercase tracking-wider text-brand-200 hover:text-white group-hover:text-white flex items-center gap-1 transition">
+                        <div class="mt-3 flex flex-wrap items-center gap-2"><button type="button" onclick="openVirtualTour('puno')" class="btn-360"><i class="fa-solid fa-street-view" aria-hidden="true"></i> Visita 360°</button><button type="button" onclick="filterPackagesByDestination('puno')" class="py-2 text-xs font-bold uppercase tracking-wider text-brand-200 hover:text-white group-hover:text-white flex items-center gap-1 transition">
                             Ver Paquetes <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                        </button>
+                        </button></div>
                     </div>
                 </article>
             </div>
@@ -472,6 +477,7 @@
                 <h3 class="font-bold text-slate-900 text-sm mb-2">No Incluye</h3>
                 <div id="detail-excludes" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-500 mb-6"></div>
 
+                <button id="btn-modal-tour" type="button" hidden class="w-full mb-3 border-2 border-brand-600 text-brand-800 hover:bg-brand-50 font-bold py-3 rounded-xl transition"><i class="fa-solid fa-street-view mr-2" aria-hidden="true"></i>Ver visita virtual 360°</button>
                 <button id="btn-modal-reserve" type="button" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl shadow-lg transition">
                     Reservar Este Paquete
                 </button>
@@ -735,5 +741,7 @@
     <script src="./config/app-config.js" defer></script>
     <script src="./js/supabase-data.js" defer></script>
     <script src="./js/app.js" defer></script>
+    <script src="./js/visita-virtual.js" defer></script>
+    <script src="./js/efectos-3d.js" defer></script>
 </body>
 </html>

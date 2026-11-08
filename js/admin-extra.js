@@ -624,6 +624,12 @@ function renderDestinationsTab() {
                         <label class="block text-xs text-slate-300">…o pega la URL de una imagen<input name="imageUrl" type="url" maxlength="500" oninput="previewDestinationUrl(this.value)" class="${INPUT}"></label>
                     </div>
                 </div>
+                <fieldset class="sm:col-span-2 xl:col-span-4 rounded-xl border border-slate-700 bg-slate-900/60 p-4 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-3 items-end">
+                    <legend class="px-2 text-xs font-bold text-emerald-300"><i class="fa-solid fa-street-view mr-1" aria-hidden="true"></i>Visita virtual (opcional)</legend>
+                    <label class="text-xs text-slate-300">Foto 360° (URL https) — si la dejas vacía se usa la foto principal como panorámica<input name="tourUrl" type="url" maxlength="500" placeholder="https://..." class="${INPUT}"></label>
+                    <label class="inline-flex items-center justify-center gap-2 cursor-pointer ${BTN_SECONDARY}"><i class="fa-solid fa-upload" aria-hidden="true"></i><span id="tour-upload-label">Subir foto 360° (JPG, máx. 15 MB)</span><input type="file" accept="image/jpeg,image/webp" class="sr-only" onchange="uploadDestinationTour(this)"></label>
+                    <label class="flex items-center gap-2 text-xs text-slate-300 lg:col-span-2"><input name="tourIs360" type="checkbox" class="rounded border-slate-600 text-brand-600 focus:ring-brand-500"> Es una foto 360° completa (proporción 2:1, tomada con cámara 360° o el modo esfera del celular)</label>
+                </fieldset>
                 <label class="flex items-center gap-2 text-xs text-slate-300"><input name="active" type="checkbox" checked class="rounded border-slate-600 text-brand-600 focus:ring-brand-500"> Publicar destino</label>
                 <div class="flex gap-2 sm:col-span-1 xl:col-span-3 justify-end">
                     <button type="button" onclick="resetDestinationForm()" class="${BTN_SECONDARY}">Limpiar</button>
@@ -639,7 +645,8 @@ function renderDestinationsTab() {
                         <div class="flex items-center justify-between gap-2"><h4 class="font-bold text-white text-sm">${escapeHtml(item.name)}</h4><span class="px-2 py-0.5 rounded font-bold text-[10px] ${item.active ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-700 text-slate-300'}">${item.active ? 'Publicado' : 'Oculto'}</span></div>
                         <p class="text-slate-400">${escapeHtml(item.region)} · orden ${Number(item.order)} · ${packagesForDestination(item)} paquete(s)</p>
                         <p class="text-slate-300 line-clamp-2">${escapeHtml(item.description)}</p>
-                        <div class="mt-auto flex gap-3 pt-2"><button type="button" onclick="editDestination('${escapeHtml(item.id)}')" class="text-sky-300 font-bold">Editar</button><button type="button" onclick="toggleDestination('${escapeHtml(item.id)}')" class="text-amber-300 font-bold">${item.active ? 'Ocultar' : 'Publicar'}</button><button type="button" onclick="removeDestination('${escapeHtml(item.id)}')" class="text-rose-300 font-bold ml-auto">Eliminar</button></div>
+                        ${item.tourUrl ? `<p class="text-emerald-300"><i class="fa-solid fa-street-view mr-1" aria-hidden="true"></i>${item.tourIs360 ? 'Tiene foto 360°' : 'Tiene panorámica propia'}</p>` : ''}
+                        <div class="mt-auto flex flex-wrap gap-3 pt-2"><button type="button" onclick="openVirtualTour('${escapeHtml(item.slug)}')" class="text-emerald-300 font-bold">Probar visita</button><button type="button" onclick="editDestination('${escapeHtml(item.id)}')" class="text-sky-300 font-bold">Editar</button><button type="button" onclick="toggleDestination('${escapeHtml(item.id)}')" class="text-amber-300 font-bold">${item.active ? 'Ocultar' : 'Publicar'}</button><button type="button" onclick="removeDestination('${escapeHtml(item.id)}')" class="text-rose-300 font-bold ml-auto">Eliminar</button></div>
                     </div>
                 </article>`).join('') : '<p class="text-sm text-slate-400">Aún no hay destinos.</p>'}
             </div>
@@ -698,6 +705,8 @@ function editDestination(destinationId) {
     form.elements.description.value = item.description;
     form.elements.keywords.value = item.keywords.join(', ');
     form.elements.imageUrl.value = item.imageUrl || '';
+    form.elements.tourUrl.value = item.tourUrl || '';
+    form.elements.tourIs360.checked = Boolean(item.tourIs360);
     form.elements.active.checked = item.active;
     extraState.pendingDestinationImage = '';
     setDestinationPreview(item.image);
@@ -708,6 +717,11 @@ async function saveDestinationForm(form) {
     const id = form.elements.id.value;
     const existing = destinations.find(row => row.id === id);
     const pastedUrl = form.elements.imageUrl.value.trim();
+    const tourUrl = form.elements.tourUrl.value.trim();
+    if (tourUrl && !/^https:\/\//i.test(tourUrl)) {
+        showToast('La URL de la foto 360° debe empezar con https://', 'rose');
+        return;
+    }
     if (pastedUrl && !/^https:\/\//i.test(pastedUrl)) {
         showToast('La URL de la imagen debe empezar con https://', 'rose');
         return;
@@ -721,6 +735,9 @@ async function saveDestinationForm(form) {
         keywords: form.elements.keywords.value.split(',').map(word => word.trim().toLowerCase()).filter(Boolean).slice(0, 20),
         order: Number(form.elements.order.value) || 0,
         active: form.elements.active.checked,
+        tourUrl,
+        tourIs360: form.elements.tourIs360.checked && Boolean(tourUrl),
+        hasTourColumns: Boolean(existing?.hasTourColumns),
         imagePath: extraState.pendingDestinationImage || pastedUrl ? null : existing?.imagePath || null,
         imageUrl: pastedUrl || (extraState.pendingDestinationImage ? null : existing?.imageUrl || null)
     };
@@ -733,6 +750,32 @@ async function saveDestinationForm(form) {
         showToast('Destino guardado. Ya se muestra en la página principal.');
     } catch (error) {
         showToast(/duplicate key/i.test(error?.message || '') ? 'Ya existe un destino con ese identificador.' : friendlyError(error, 'No se pudo guardar el destino.'), 'rose');
+    }
+}
+
+async function uploadDestinationTour(input) {
+    const file = input.files?.[0];
+    const form = document.getElementById('destination-form');
+    const label = document.getElementById('tour-upload-label');
+    if (!file || !form) return;
+    label.textContent = 'Subiendo…';
+    try {
+        const url = await window.OrquideasStore.uploadTourImage(currentUser.id, file);
+        form.elements.tourUrl.value = url;
+        const size = await new Promise(resolve => {
+            const image = new Image();
+            image.onload = () => resolve([image.naturalWidth, image.naturalHeight]);
+            image.onerror = () => resolve([0, 0]);
+            image.src = URL.createObjectURL(file);
+        });
+        const ratio = size[1] ? size[0] / size[1] : 0;
+        form.elements.tourIs360.checked = ratio > 1.9 && ratio < 2.1;
+        showToast(form.elements.tourIs360.checked ? 'Foto 360° subida. Guarda el destino para publicarla.' : 'Foto subida como panorámica (no es 2:1). Guarda el destino.');
+    } catch (error) {
+        showToast(friendlyError(error, 'No se pudo subir la foto 360°. ¿Ejecutaste database/visita_virtual.sql?'), 'rose');
+    } finally {
+        label.textContent = 'Subir foto 360° (JPG, máx. 15 MB)';
+        input.value = '';
     }
 }
 

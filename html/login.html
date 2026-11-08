@@ -3,38 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Iniciar sesión | Orquídea Tour Perú</title>
     <meta name="description" content="Inicia sesión en Orquídea Tour Perú para gestionar tus reservas y paquetes turísticos.">
     <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#16a34a">
+    <meta name="theme-color" content="#064e3b">
+    <link rel="canonical" href="https://orquideatourperu.vercel.app/html/login.html">
     <link rel="icon" type="image/jpeg" href="../img/logo.png">
     <link rel="apple-touch-icon" href="../img/logo.png">
-    <title>Iniciar sesión | Orquídea Tour Perú</title>
     <script src="https://cdn.tailwindcss.com/3.4.5"></script>
     <script src="../config/tailwind-config.js"></script>
     <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/auth.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-800 flex flex-col">
-    <header class="w-full border-b border-slate-200 bg-white">
-        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="../index.html" class="flex items-center gap-3"><img src="../img/logo.png" alt="Orquídea Tour Perú" class="w-11 h-11 object-contain"><span class="font-extrabold text-slate-900">ORQUÍDEA <small class="block text-xs font-semibold text-brand-700">TOUR PERÚ</small></span></a>
-            <a href="../index.html" class="text-sm font-semibold text-slate-600 hover:text-brand-700">Volver al inicio</a>
+<body class="auth-body">
+    <a href="#contenido" class="skip-link">Saltar al contenido</a>
+    <div class="auth-bg" aria-hidden="true">
+        <span class="auth-blob b1"></span><span class="auth-blob b2"></span><span class="auth-blob b3"></span>
+        <svg class="auth-mountains" viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path fill="rgba(255,255,255,0.08)" d="M0 220 L180 120 L300 190 L470 70 L640 200 L800 110 L960 210 L1130 90 L1290 180 L1440 120 L1440 320 L0 320Z"/>
+            <path fill="rgba(2,44,34,0.45)" d="M0 260 L150 190 L280 240 L420 160 L560 250 L720 170 L880 250 L1040 180 L1200 250 L1340 200 L1440 230 L1440 320 L0 320Z"/>
+            <path fill="rgba(2,30,24,0.65)" d="M0 300 L200 250 L380 290 L560 240 L760 295 L960 250 L1160 300 L1320 260 L1440 285 L1440 320 L0 320Z"/>
+        </svg>
+    </div>
+
+    <header class="auth-header">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
+            <a href="../index.html" class="flex items-center gap-3 text-white">
+                <span class="w-11 h-11 rounded-xl bg-white grid place-items-center overflow-hidden shadow"><img src="../img/logo.png" alt="Logo de Orquídea Tour Perú" width="44" height="44" class="w-full h-full object-contain"></span>
+                <span class="font-extrabold leading-tight">ORQUÍDEA<small class="block text-xs font-semibold text-emerald-200 tracking-widest">TOUR PERÚ</small></span>
+            </a>
+            <a href="../index.html" class="text-sm font-semibold text-white/90 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-full px-4 py-2 transition"><i class="fa-solid fa-arrow-left mr-1.5" aria-hidden="true"></i>Inicio</a>
         </div>
     </header>
-    <main class="flex-1 grid place-items-center px-4 py-10">
-        <section class="w-full max-w-md bg-white border border-slate-200 rounded-2xl shadow-sm p-6 sm:p-8">
-            <div class="text-center mb-7"><img src="../img/logo.png" alt="" class="w-16 h-16 object-contain mx-auto"><p class="text-xs font-bold uppercase tracking-widest text-brand-700 mt-3">Tu próximo viaje comienza aquí</p><h1 class="text-2xl font-black text-slate-900 mt-1">Inicia sesión</h1><p class="text-sm text-slate-500 mt-2">Accede a tus reservas y datos de viaje.</p></div>
-            <form onsubmit="event.preventDefault(); submitLogin(this);" class="space-y-4">
-                <label class="block text-sm font-semibold text-slate-700">Correo electrónico<input name="email" type="email" autocomplete="email" required class="mt-1 w-full rounded-lg border border-slate-300 px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"></label>
-                <label class="block text-sm font-semibold text-slate-700">Contraseña<input name="password" type="password" autocomplete="current-password" required class="mt-1 w-full rounded-lg border border-slate-300 px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"></label>
-                <div id="auth-message" class="hidden" role="status" aria-live="polite"></div>
-                <button type="submit" class="w-full rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 transition">Iniciar sesión</button>
-            </form>
-            <p class="text-center text-sm text-slate-600 mt-6">¿Aún no tienes una cuenta? <a href="registro.html" class="font-bold text-brand-700 hover:underline">Regístrate</a></p>
+
+    <main id="contenido" class="auth-main">
+        <section class="auth-card" aria-labelledby="auth-title">
+            <div class="mascot-badge" data-mascot></div>
+
+            <!-- Vista: iniciar sesión -->
+            <div data-view="login">
+                <div class="text-center mb-6">
+                    <h1 id="auth-title" class="text-2xl sm:text-3xl font-black text-slate-900">¡Hola de nuevo!</h1>
+                    <p class="text-sm text-slate-500 mt-1.5">Ingresa para ver tus reservas y próximos viajes.</p>
+                </div>
+                <form onsubmit="event.preventDefault(); submitLogin(this);" class="space-y-4">
+                    <div>
+                        <label for="login-email" class="auth-label">Correo electrónico</label>
+                        <span class="auth-field"><i class="lead fa-solid fa-envelope" aria-hidden="true"></i><input id="login-email" name="email" type="email" autocomplete="email" required data-mascot-look placeholder="tu@correo.com" class="auth-input"></span>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label for="login-password" class="auth-label !mb-0">Contraseña</label>
+                            <button type="button" data-show-view="forgot" class="text-xs font-bold text-brand-700 hover:underline">¿La olvidaste?</button>
+                        </div>
+                        <span class="auth-field"><i class="lead fa-solid fa-lock" aria-hidden="true"></i><input id="login-password" name="password" type="password" autocomplete="current-password" required data-mascot-hide placeholder="••••••••••" class="auth-input pr-12"><button type="button" class="auth-toggle" data-toggle-password="login-password" aria-label="Mostrar contraseña" aria-pressed="false"><i class="fa-solid fa-eye" aria-hidden="true"></i></button></span>
+                    </div>
+                    <div id="auth-message" class="hidden" role="status" aria-live="polite"></div>
+                    <button type="submit" class="auth-submit">Iniciar sesión <i class="fa-solid fa-arrow-right ml-1" aria-hidden="true"></i></button>
+                </form>
+                <p class="text-center text-sm text-slate-600 mt-6">¿Aún no tienes cuenta? <a href="registro.html" class="font-bold text-brand-700 hover:underline">Regístrate gratis</a></p>
+            </div>
+
+            <!-- Vista: recuperar contraseña -->
+            <div data-view="forgot" class="hidden">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-black text-slate-900">Recuperar contraseña</h2>
+                    <p class="text-sm text-slate-500 mt-1.5">Te enviaremos un enlace para crear una nueva.</p>
+                </div>
+                <form onsubmit="event.preventDefault(); requestPasswordReset(this);" class="space-y-4">
+                    <div>
+                        <label for="forgot-email" class="auth-label">Correo electrónico</label>
+                        <span class="auth-field"><i class="lead fa-solid fa-envelope" aria-hidden="true"></i><input id="forgot-email" name="email" type="email" autocomplete="email" required data-mascot-look class="auth-input"></span>
+                    </div>
+                    <button type="submit" class="auth-submit">Enviar enlace</button>
+                </form>
+                <button type="button" data-show-view="login" class="block mx-auto mt-6 text-sm font-bold text-brand-700 hover:underline"><i class="fa-solid fa-arrow-left mr-1" aria-hidden="true"></i>Volver a iniciar sesión</button>
+            </div>
+
+            <!-- Vista: nueva contraseña (llega desde el correo) -->
+            <div data-view="recovery" class="hidden">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-black text-slate-900">Crea tu nueva contraseña</h2>
+                    <p class="text-sm text-slate-500 mt-1.5">Usa al menos 10 caracteres.</p>
+                </div>
+                <form onsubmit="event.preventDefault(); saveNewPassword(this);" class="space-y-4">
+                    <div>
+                        <label for="new-password" class="auth-label">Nueva contraseña</label>
+                        <span class="auth-field"><i class="lead fa-solid fa-lock" aria-hidden="true"></i><input id="new-password" name="newPassword" type="password" minlength="10" autocomplete="new-password" required data-mascot-hide data-strength="new-strength" class="auth-input pr-12"><button type="button" class="auth-toggle" data-toggle-password="new-password" aria-label="Mostrar contraseña" aria-pressed="false"><i class="fa-solid fa-eye" aria-hidden="true"></i></button></span>
+                        <div class="strength-bar mt-2"><span id="new-strength"></span></div>
+                    </div>
+                    <div>
+                        <label for="confirm-new-password" class="auth-label">Repite la contraseña</label>
+                        <span class="auth-field"><i class="lead fa-solid fa-lock" aria-hidden="true"></i><input id="confirm-new-password" name="confirmNewPassword" type="password" minlength="10" autocomplete="new-password" required data-mascot-hide class="auth-input"></span>
+                    </div>
+                    <button type="submit" class="auth-submit">Guardar contraseña</button>
+                </form>
+            </div>
+
         </section>
     </main>
+
+    <footer class="auth-footer text-center text-xs text-white/70 pb-6 px-4">
+        <a href="terminos.html" class="hover:text-white">Términos</a> · <a href="privacidad.html" class="hover:text-white">Privacidad</a> · <a href="libro-reclamaciones.html" class="hover:text-white">Libro de Reclamaciones</a>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
     <script src="../config/supabase-config.js"></script>
     <script src="../js/auth.js"></script>
+    <script src="../js/mascota.js"></script>
+    <script src="../js/auth-page.js"></script>
 </body>
 </html>

@@ -3,44 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Crear cuenta | Orquídea Tour Perú</title>
     <meta name="description" content="Crea tu cuenta en Orquídea Tour Perú y reserva paquetes turísticos a Cusco, Arequipa, Paracas y Puno.">
     <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#16a34a">
+    <meta name="theme-color" content="#064e3b">
+    <link rel="canonical" href="https://orquideatourperu.vercel.app/html/registro.html">
     <link rel="icon" type="image/jpeg" href="../img/logo.png">
     <link rel="apple-touch-icon" href="../img/logo.png">
-    <title>Crear cuenta | Orquídea Tour Perú</title>
     <script src="https://cdn.tailwindcss.com/3.4.5"></script>
     <script src="../config/tailwind-config.js"></script>
     <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/auth.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-800 flex flex-col">
-    <header class="w-full border-b border-slate-200 bg-white">
-        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="../index.html" class="flex items-center gap-3"><img src="../img/logo.png" alt="Orquídea Tour Perú" class="w-11 h-11 object-contain"><span class="font-extrabold text-slate-900">ORQUÍDEA <small class="block text-xs font-semibold text-brand-700">TOUR PERÚ</small></span></a>
-            <a href="../index.html" class="text-sm font-semibold text-slate-600 hover:text-brand-700">Volver al inicio</a>
+<body class="auth-body">
+    <a href="#contenido" class="skip-link">Saltar al contenido</a>
+    <div class="auth-bg" aria-hidden="true">
+        <span class="auth-blob b1"></span><span class="auth-blob b2"></span><span class="auth-blob b3"></span>
+        <svg class="auth-mountains" viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path fill="rgba(255,255,255,0.08)" d="M0 220 L180 120 L300 190 L470 70 L640 200 L800 110 L960 210 L1130 90 L1290 180 L1440 120 L1440 320 L0 320Z"/>
+            <path fill="rgba(2,44,34,0.45)" d="M0 260 L150 190 L280 240 L420 160 L560 250 L720 170 L880 250 L1040 180 L1200 250 L1340 200 L1440 230 L1440 320 L0 320Z"/>
+            <path fill="rgba(2,30,24,0.65)" d="M0 300 L200 250 L380 290 L560 240 L760 295 L960 250 L1160 300 L1320 260 L1440 285 L1440 320 L0 320Z"/>
+        </svg>
+    </div>
+
+    <header class="auth-header">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
+            <a href="../index.html" class="flex items-center gap-3 text-white">
+                <span class="w-11 h-11 rounded-xl bg-white grid place-items-center overflow-hidden shadow"><img src="../img/logo.png" alt="Logo de Orquídea Tour Perú" width="44" height="44" class="w-full h-full object-contain"></span>
+                <span class="font-extrabold leading-tight">ORQUÍDEA<small class="block text-xs font-semibold text-emerald-200 tracking-widest">TOUR PERÚ</small></span>
+            </a>
+            <a href="login.html" class="text-sm font-semibold text-white/90 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-full px-4 py-2 transition">Iniciar sesión</a>
         </div>
     </header>
-    <main class="flex-1 grid place-items-center px-4 py-8">
-        <section class="w-full max-w-xl bg-white border border-slate-200 rounded-2xl shadow-sm p-5 sm:p-8">
-            <div class="text-center mb-6"><img src="../img/logo.png" alt="" class="w-14 h-14 object-contain mx-auto"><p class="text-xs font-bold uppercase tracking-widest text-brand-700 mt-2">Únete a nosotros</p><h1 class="text-2xl font-black text-slate-900 mt-1">Crear cuenta</h1><p class="text-sm text-slate-500 mt-2">Regístrate para administrar tus viajes y reservas.</p></div>
-            <form onsubmit="event.preventDefault(); submitRegistration(this);" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <label class="text-sm font-semibold text-slate-700">Nombres<input name="firstName" autocomplete="given-name" required class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"></label>
-                <label class="text-sm font-semibold text-slate-700">Apellidos<input name="lastName" autocomplete="family-name" required class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"></label>
-                <label class="text-sm font-semibold text-slate-700">DNI / Pasaporte<input name="document" autocomplete="off" required class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"></label>
-                <label class="text-sm font-semibold text-slate-700">Teléfono<input name="phone" type="tel" autocomplete="tel" required class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"></label>
-                <label class="sm:col-span-2 text-sm font-semibold text-slate-700">Correo electrónico<input name="email" type="email" autocomplete="email" required class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"></label>
-                <label class="text-sm font-semibold text-slate-700">Contraseña<input name="password" type="password" autocomplete="new-password" minlength="8" required class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"><span class="block text-xs font-normal text-slate-500 mt-1">Mínimo 8 caracteres.</span></label>
-                <label class="text-sm font-semibold text-slate-700">Confirmar contraseña<input name="confirmPassword" type="password" autocomplete="new-password" minlength="8" required class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"></label>
-                <label class="sm:col-span-2 flex items-start gap-2 text-xs text-slate-600"><input name="terms" type="checkbox" required class="mt-0.5 rounded border-slate-300 text-brand-600 focus:ring-brand-500"><span>Acepto los <a href="terminos.html" target="_blank" class="text-brand-700 underline">términos</a> y la <a href="privacidad.html" target="_blank" class="text-brand-700 underline">política de privacidad</a>.</span></label>
+
+    <main id="contenido" class="auth-main">
+        <section class="auth-card wide" aria-labelledby="auth-title">
+            <div class="mascot-badge" data-mascot></div>
+            <div class="text-center mb-6">
+                <h1 id="auth-title" class="text-2xl sm:text-3xl font-black text-slate-900">Crea tu cuenta</h1>
+                <p class="text-sm text-slate-500 mt-1.5">Reserva y gestiona tus viajes por el Perú en un solo lugar.</p>
+            </div>
+            <form onsubmit="event.preventDefault(); submitRegistration(this);" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label for="reg-first" class="auth-label">Nombres</label>
+                    <span class="auth-field"><i class="lead fa-solid fa-user" aria-hidden="true"></i><input id="reg-first" name="firstName" autocomplete="given-name" required maxlength="60" data-mascot-look class="auth-input"></span>
+                </div>
+                <div>
+                    <label for="reg-last" class="auth-label">Apellidos</label>
+                    <span class="auth-field"><i class="lead fa-solid fa-user" aria-hidden="true"></i><input id="reg-last" name="lastName" autocomplete="family-name" required maxlength="60" data-mascot-look class="auth-input"></span>
+                </div>
+                <div>
+                    <label for="reg-doc" class="auth-label">DNI / Pasaporte</label>
+                    <span class="auth-field"><i class="lead fa-solid fa-id-card" aria-hidden="true"></i><input id="reg-doc" name="document" autocomplete="off" required minlength="6" maxlength="20" data-mascot-look class="auth-input"></span>
+                </div>
+                <div>
+                    <label for="reg-phone" class="auth-label">Teléfono</label>
+                    <span class="auth-field"><i class="lead fa-solid fa-phone" aria-hidden="true"></i><input id="reg-phone" name="phone" type="tel" autocomplete="tel" required maxlength="20" data-mascot-look class="auth-input"></span>
+                </div>
+                <div class="sm:col-span-2">
+                    <label for="reg-email" class="auth-label">Correo electrónico</label>
+                    <span class="auth-field"><i class="lead fa-solid fa-envelope" aria-hidden="true"></i><input id="reg-email" name="email" type="email" autocomplete="email" required maxlength="150" data-mascot-look class="auth-input"></span>
+                </div>
+                <div>
+                    <label for="reg-password" class="auth-label">Contraseña</label>
+                    <span class="auth-field"><i class="lead fa-solid fa-lock" aria-hidden="true"></i><input id="reg-password" name="password" type="password" autocomplete="new-password" minlength="10" required data-mascot-hide data-strength="reg-strength" class="auth-input pr-12"><button type="button" class="auth-toggle" data-toggle-password="reg-password" aria-label="Mostrar contraseña" aria-pressed="false"><i class="fa-solid fa-eye" aria-hidden="true"></i></button></span>
+                    <div class="strength-bar mt-2"><span id="reg-strength"></span></div>
+                    <p class="text-xs text-slate-500 mt-1">Mínimo 10 caracteres. <span id="reg-strength-label" class="font-bold"></span></p>
+                </div>
+                <div>
+                    <label for="reg-confirm" class="auth-label">Confirmar contraseña</label>
+                    <span class="auth-field"><i class="lead fa-solid fa-lock" aria-hidden="true"></i><input id="reg-confirm" name="confirmPassword" type="password" autocomplete="new-password" minlength="10" required data-mascot-hide data-match="reg-password" class="auth-input"></span>
+                </div>
+                <label class="sm:col-span-2 flex items-start gap-2.5 text-sm text-slate-600">
+                    <input name="terms" type="checkbox" required class="mt-0.5 w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                    <span>Acepto los <a href="terminos.html" target="_blank" class="text-brand-700 font-semibold underline">términos</a> y la <a href="privacidad.html" target="_blank" class="text-brand-700 font-semibold underline">política de privacidad</a>.</span>
+                </label>
                 <div id="auth-message" class="hidden sm:col-span-2" role="status" aria-live="polite"></div>
-                <button type="submit" class="sm:col-span-2 w-full rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 transition">Crear cuenta</button>
+                <button type="submit" class="auth-submit sm:col-span-2">Crear cuenta <i class="fa-solid fa-arrow-right ml-1" aria-hidden="true"></i></button>
             </form>
-            <p class="text-center text-sm text-slate-600 mt-5">¿Ya tienes cuenta? <a href="login.html" class="font-bold text-brand-700 hover:underline">Inicia sesión</a></p>
+            <p class="text-center text-sm text-slate-600 mt-6">¿Ya tienes cuenta? <a href="login.html" class="font-bold text-brand-700 hover:underline">Inicia sesión</a></p>
         </section>
     </main>
+
+    <footer class="auth-footer text-center text-xs text-white/70 pb-6 px-4">
+        <a href="terminos.html" class="hover:text-white">Términos</a> · <a href="privacidad.html" class="hover:text-white">Privacidad</a> · <a href="libro-reclamaciones.html" class="hover:text-white">Libro de Reclamaciones</a>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
     <script src="../config/supabase-config.js"></script>
     <script src="../js/auth.js"></script>
+    <script src="../js/mascota.js"></script>
+    <script src="../js/auth-page.js"></script>
 </body>
 </html>
