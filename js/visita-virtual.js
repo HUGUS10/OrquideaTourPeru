@@ -1,47 +1,76 @@
 // =====================================================================
 // Visita virtual inmersiva — Orquídea Tour Perú
-// - Tour 360° por escenas (fotos 360° reales) con menú, miniaturas,
-//   flechas y puntos de salto dentro de la imagen.
-// - Si un destino no tiene escenas: vista panorámica con paradas guiadas.
+// - Recorrido por escenas: fotos 360° completas y panorámicas amplias.
+// - Menú numerado, miniaturas, flechas y puntos de salto en la imagen.
 // - "4D": momento del día (amanecer, mediodía, atardecer, noche) y
 //   recorrido automático.
+// - Las fotos se cargan como imagen normal y se entregan al visor ya
+//   descargadas (funciona aunque haya bloqueadores de privacidad).
 // =====================================================================
 (() => {
     const PANNELLUM_JS = 'https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.js';
     const PANNELLUM_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.css';
     const WIKI = 'https://upload.wikimedia.org/wikipedia/commons/thumb/';
-    const WIKI_CREDIT = 'Johnattan Rupire · CC BY-SA 4.0 · Wikimedia Commons';
 
-    // Escenas 360° libres incluidas (se usan si la base de datos aún no tiene escenas).
+    // Foto de Wikimedia Commons con licencia libre (se muestra el crédito obligatorio).
+    function wiki(path, title, description, author, license, options = {}) {
+        const name = path.split('/').pop();
+        return {
+            title,
+            description,
+            image: `${WIKI}${path}/3840px-${name}`,
+            credit: `${author} · ${license} · Wikimedia Commons`,
+            creditUrl: `https://commons.wikimedia.org/wiki/File:${name}`,
+            is360: Boolean(options.is360),
+            haov: options.haov || 0,
+            yaw: options.yaw || 0,
+            pitch: options.pitch || 0
+        };
+    }
+
+    const RUPIRE = ['Johnattan Rupire', 'CC BY-SA 4.0'];
+    const DELSO = ['Diego Delso', 'CC BY-SA 4.0'];
+
+    // Recorridos incluidos (se usan si el destino aún no tiene escenas propias en la base de datos).
     const BUILTIN_SCENES = {
         cusco: [
-            ['Plaza de Armas', 'Corazón de la ciudad imperial, rodeada de portales coloniales.', '3/30/Plaza_de_armas_del_Cusco%2C_vista_360.jpg', 'Plaza_de_armas_del_Cusco,_vista_360.jpg'],
-            ['Catedral del Cusco', 'Joya del barroco andino construida sobre un palacio inca.', '1/1d/Actual_catedra%C4%BA_del_Cusco%2C_Plaza_de_armas.jpg', 'Actual_catedra%C4%BA_del_Cusco,_Plaza_de_armas.jpg'],
-            ['Iglesia de la Plaza', 'Templos coloniales que enmarcan la plaza principal.', '9/9d/Vista_360_plaza_del_Cusco%2C_Iglesia.jpg', 'Vista_360_plaza_del_Cusco,_Iglesia.jpg'],
-            ['Templo de la Sagrada Familia', 'Capilla colonial junto a la Catedral.', 'c/c7/Vista_360_del_tempro_de_La_Sagrada_Familia_en_el_Cusco.jpg', 'Vista_360_del_tempro_de_La_Sagrada_Familia_en_el_Cusco.jpg'],
-            ['Calles de San Blas', 'Subida empedrada entre Tandapata y Kiskapata, junto al mirador.', 'f/f3/Subida_entre_las_calles_Tandapata_y_Kiskapata%2C_al_lado_del_Mirador_de_San_Blas%2C_Cusco.jpg', 'Subida_entre_las_calles_Tandapata_y_Kiskapata,_al_lado_del_Mirador_de_San_Blas,_Cusco.jpg'],
-            ['Vista de la ciudad', 'Panorámica de los techos de teja del Cusco.', '3/3e/Ciudad_del_cusco_vista_360.jpg', 'Ciudad_del_cusco_vista_360.jpg'],
-            ['Kusilluchayuq (Templo de los Monos)', 'Huaca inca tallada en la roca, a las afueras de la ciudad.', '3/39/Kusilluchayuq%2C_Cusco%2C_360.jpg', 'Kusilluchayuq,_Cusco,_360.jpg'],
-            ['Huaca de la Luna', 'Santuario inca de piedra rodeado de campiña andina.', 'd/d9/Huaca_de_la_Luna%2C_Cusco%2C_360.jpg', 'Huaca_de_la_Luna,_Cusco,_360.jpg'],
-            ['Camino Inca al Antisuyu', 'Tramo original del Qhapaq Ñan que salía del Cusco.', 'a/aa/Camino_Inca_al_Antisuyu_360.jpg', 'Camino_Inca_al_Antisuyu_360.jpg']
-        ].map(([title, description, path, file], index) => {
-            const name = path.split('/').pop();
-            return { id: `builtin-${index}`, title, description, image: `${WIKI}${path}/3840px-${name}`, credit: WIKI_CREDIT, creditUrl: `https://commons.wikimedia.org/wiki/File:${file}`, yaw: 0, pitch: 0 };
-        })
+            wiki('a/a8/99_-_Machu_Picchu_-_Juin_2009.jpg', 'Machu Picchu: vista clásica', 'La ciudadela inca con el Huayna Picchu al fondo.', 'Martin St-Amant', 'CC BY-SA 3.0', { haov: 190 }),
+            wiki('c/c5/Machu_Picchu_panorama.jpg', 'Machu Picchu: panorámica', 'Terrazas, templos y plazas entre montañas y nubes.', 'Brian Jeffery Beggerly', 'CC BY 2.0', { haov: 140 }),
+            wiki('6/6e/1_pano_machu_picchu_guard_house_river_2014.jpg', 'Casa del Guardián y río Urubamba', 'El mirador más famoso, sobre el valle del Urubamba.', 'Chensiyuan', 'CC BY-SA 3.0', { haov: 110 }),
+            wiki('3/30/Plaza_de_armas_del_Cusco%2C_vista_360.jpg', 'Plaza de Armas del Cusco', 'Corazón de la ciudad imperial, rodeada de portales coloniales.', ...RUPIRE, { is360: true }),
+            wiki('1/1d/Actual_catedra%C4%BA_del_Cusco%2C_Plaza_de_armas.jpg', 'Catedral del Cusco', 'Joya del barroco andino construida sobre un palacio inca.', ...RUPIRE, { is360: true }),
+            wiki('9/9d/Vista_360_plaza_del_Cusco%2C_Iglesia.jpg', 'Iglesia de la Plaza', 'Templos coloniales que enmarcan la plaza principal.', ...RUPIRE, { is360: true }),
+            wiki('f/f3/Subida_entre_las_calles_Tandapata_y_Kiskapata%2C_al_lado_del_Mirador_de_San_Blas%2C_Cusco.jpg', 'Calles de San Blas', 'Subida empedrada entre Tandapata y Kiskapata, junto al mirador.', ...RUPIRE, { is360: true }),
+            wiki('3/3e/Ciudad_del_cusco_vista_360.jpg', 'Vista de la ciudad', 'Panorámica de los techos de teja del Cusco.', ...RUPIRE, { is360: true }),
+            wiki('3/39/Kusilluchayuq%2C_Cusco%2C_360.jpg', 'Kusilluchayuq (Templo de los Monos)', 'Huaca inca tallada en la roca, a las afueras de la ciudad.', ...RUPIRE, { is360: true }),
+            wiki('d/d9/Huaca_de_la_Luna%2C_Cusco%2C_360.jpg', 'Huaca de la Luna', 'Santuario inca de piedra rodeado de campiña andina.', ...RUPIRE, { is360: true }),
+            wiki('a/aa/Camino_Inca_al_Antisuyu_360.jpg', 'Camino Inca al Antisuyu', 'Tramo original del Qhapaq Ñan que salía del Cusco.', ...RUPIRE, { is360: true })
+        ],
+        arequipa: [
+            wiki('a/a2/Panor%C3%A1mica_cerca_de_Arequipa%2C_Per%C3%BA%2C_2015-08-02%2C_DD_04-07_PAN.JPG', 'Volcanes de Arequipa', 'El Misti, el Chachani y el Pichu Pichu custodian la Ciudad Blanca.', ...DELSO, { haov: 180 }),
+            wiki('a/a0/Colca_Canyon_Panorama.jpg', 'Cañón del Colca', 'Uno de los cañones más profundos del mundo.', 'Ivan Mlinaric', 'CC BY 2.0', { haov: 190 }),
+            wiki('7/7a/Colca_Valley_Panorama.jpg', 'Valle del Colca', 'Andenes preincas que siguen cultivándose hoy.', 'Ivan Mlinaric', 'CC BY 2.0', { haov: 170 }),
+            wiki('f/fc/Colca_canyon_panorama.jpg', 'Mirador del Colca', 'Vista de casi 360° desde el borde del cañón.', 'Cédric Liénart', 'CC BY-SA 3.0', { haov: 340 })
+        ],
+        ica: [
+            wiki('b/b8/Vista_panor%C3%A0mica_de_Huacachina.jpg', 'Oasis de Huacachina', 'Laguna rodeada de palmeras y dunas gigantes.', 'Pitxiquin', 'CC BY-SA 4.0', { haov: 200 }),
+            wiki('f/fc/Huacachina_Oasis_Panorama.JPG', 'Huacachina desde las dunas', 'Punto de partida de los tubulares y el sandboard.', 'Kob123456', 'CC BY-SA 4.0', { haov: 140 }),
+            wiki('f/f8/Paracas_-_pou%C5%A1%C5%A5_-_panoramio.jpg', 'Desierto de Paracas', 'La reserva donde el desierto se encuentra con el océano.', 'Pavel Špindler', 'CC BY 3.0', { haov: 130 }),
+            wiki('1/1d/Ballestas_Islands_P%C3%A9rou_2011.jpg', 'Islas Ballestas', 'Lobos marinos, pingüinos de Humboldt y aves guaneras.', 'Pierre André Leclercq', 'CC BY-SA 4.0', { haov: 115 })
+        ],
+        puno: [
+            wiki('c/c7/Islas_flotantes_de_los_Uros%2C_Lago_Titicaca%2C_Per%C3%BA%2C_2015-08-01%2C_DD_44-48_PAN.jpg', 'Islas flotantes de los Uros', 'Islas construidas a mano con totora.', ...DELSO, { haov: 220 }),
+            wiki('c/c7/Vista_de_Puno_y_el_Titicaca%2C_Per%C3%BA%2C_2015-08-01%2C_DD_64-72_PAN.JPG', 'Puno y el lago Titicaca', 'La ciudad junto al lago navegable más alto del mundo.', ...DELSO, { haov: 360 }),
+            wiki('f/f1/Islas_flotantes_de_los_Uros%2C_Lago_Titicaca%2C_Per%C3%BA%2C_2015-08-01%2C_DD_19.JPG', 'Vida en los Uros', 'Casas y botes tradicionales de totora.', ...DELSO, { haov: 110 }),
+            wiki('3/35/Amanecer_en_el_lago_Titicaca%2C_Puno%2C_Per%C3%BA%2C_2015-08-01%2C_DD_01.JPG', 'Amanecer en el Titicaca', 'El sol nace sobre el lago sagrado de los incas.', ...DELSO, { haov: 100 })
+        ]
     };
 
     const FALLBACK = {
-        cusco: { name: 'Cusco & Machu Picchu', region: 'Sierra Sur', image: 'https://images.unsplash.com/photo-1526392060635-9d6019884377', externalTourUrl: 'https://machupicchu360.com/tour-virtual-360/', externalTourLabel: 'Tour 360° de Machu Picchu' },
-        arequipa: { name: 'Arequipa & Colca', region: 'Sur del Perú', image: 'https://images.unsplash.com/photo-1589553416260-f586c8f1514f' },
-        ica: { name: 'Paracas & Huacachina', region: 'Costa Sur', image: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9' },
-        puno: { name: 'Puno & Titicaca', region: 'Altiplano', image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa' }
-    };
-
-    const STOPS = {
-        cusco: [['Llegada a la ciudadela', 'Primer vistazo a las terrazas incas entre montañas.'], ['Templo del Sol', 'Muros de piedra tallada con precisión milimétrica.'], ['Huayna Picchu', 'La montaña icónica que custodia Machu Picchu.'], ['Terrazas agrícolas', 'Andenes donde los incas cultivaban a gran altura.'], ['Mirador final', 'La postal clásica antes de descender al pueblo.']],
-        arequipa: [['Plaza de Armas', 'La Ciudad Blanca y sus portales de sillar.'], ['Volcán Misti', 'El guardián de Arequipa, a 5 822 m s. n. m.'], ['Cañón del Colca', 'Uno de los cañones más profundos del mundo.'], ['Cruz del Cóndor', 'Mirador para ver volar al cóndor andino.'], ['Baños termales', 'Relájate en las aguas de La Calera.']],
-        ica: [['Islas Ballestas', 'Lobos marinos, pingüinos y aves guaneras.'], ['Reserva de Paracas', 'Desierto que se encuentra con el océano.'], ['Oasis de Huacachina', 'Laguna rodeada de palmeras y dunas.'], ['Tubulares y sandboard', 'Adrenalina sobre las dunas doradas.'], ['Atardecer en las dunas', 'El sol cae sobre el desierto de Ica.']],
-        puno: [['Puerto de Puno', 'Punto de partida hacia el lago sagrado.'], ['Islas de los Uros', 'Islas flotantes hechas de totora.'], ['Isla Taquile', 'Tejidos declarados patrimonio de la humanidad.'], ['Lago Titicaca', 'El lago navegable más alto del mundo.'], ['Cielo del altiplano', 'Noches estrelladas a 3 800 m de altura.']]
+        cusco: { name: 'Cusco & Machu Picchu', region: 'Sierra Sur', externalTourUrl: 'https://machupicchu360.com/tour-virtual-360/', externalTourLabel: 'Tour 360° de Machu Picchu' },
+        arequipa: { name: 'Arequipa & Colca', region: 'Sur del Perú' },
+        ica: { name: 'Paracas & Huacachina', region: 'Costa Sur' },
+        puno: { name: 'Puno & Titicaca', region: 'Altiplano' }
     };
 
     const TIMES = [
@@ -56,13 +85,15 @@
     let current = null;
     let guidedTimer = null;
     let pannellumPromise = null;
+    let loadToken = 0;
+    let maxTexture = 0;
+    const blobCache = new Map();
 
     const $ = selector => modal.querySelector(selector);
     const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
     const smallScreen = () => Math.min(window.screen.width, window.screen.height) < 820;
 
     function sizedImage(url) {
-        // En celulares se usa la versión de 1920 px (más liviana).
         return smallScreen() ? url.replace('/3840px-', '/1920px-') : url;
     }
 
@@ -70,6 +101,47 @@
         if (url.includes('upload.wikimedia.org')) return url.replace(/\/\d+px-/, '/1280px-');
         if (url.includes('images.unsplash.com')) return `${url.split('?')[0]}?q=60&w=400&h=200&fit=crop&auto=format`;
         return url;
+    }
+
+    function textureLimit() {
+        if (maxTexture) return maxTexture;
+        try {
+            const gl = document.createElement('canvas').getContext('webgl');
+            maxTexture = Math.min(gl ? gl.getParameter(gl.MAX_TEXTURE_SIZE) : 4096, 4096);
+        } catch (error) {
+            maxTexture = 4096;
+        }
+        return maxTexture;
+    }
+
+    // Carga la foto como <img> (permitida por img-src) y la convierte en blob local para el visor.
+    function loadPanorama(url) {
+        if (blobCache.has(url)) return Promise.resolve(blobCache.get(url));
+        return new Promise(resolve => {
+            const image = new Image();
+            image.crossOrigin = 'anonymous';
+            image.decoding = 'async';
+            image.onload = () => {
+                const width = image.naturalWidth;
+                const height = image.naturalHeight;
+                try {
+                    const scale = Math.min(1, textureLimit() / width);
+                    const canvas = document.createElement('canvas');
+                    canvas.width = Math.round(width * scale);
+                    canvas.height = Math.round(height * scale);
+                    canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+                    canvas.toBlob(blob => {
+                        const result = { url: blob ? URL.createObjectURL(blob) : url, width, height, local: Boolean(blob) };
+                        blobCache.set(url, result);
+                        resolve(result);
+                    }, 'image/jpeg', 0.9);
+                } catch (error) {
+                    resolve({ url, width, height, local: false });
+                }
+            };
+            image.onerror = () => resolve({ url, width: 0, height: 0, failed: true });
+            image.src = url;
+        });
     }
 
     function loadPannellum() {
@@ -101,17 +173,18 @@
         if (fromDb?.id && window.OrquideasStore?.loadTourScenes) {
             try { scenes = await window.OrquideasStore.loadTourScenes(fromDb.id); } catch (error) { scenes = null; }
         }
-        if (!scenes || !scenes.length) scenes = BUILTIN_SCENES[slug] || [];
-        if (!scenes.length && fromDb?.tourUrl && fromDb.tourIs360) {
-            scenes = [{ id: 'own-360', title: fromDb.name, description: fromDb.description || '', image: fromDb.tourUrl, credit: '', creditUrl: '', yaw: 0, pitch: 0 }];
+        const legacySeed = scenes?.length && !scenes[0].hasTypeColumns && BUILTIN_SCENES[slug];
+        if (!scenes || !scenes.length || legacySeed) scenes = BUILTIN_SCENES[slug] || [];
+        if (!scenes.length && fromDb?.tourUrl) {
+            scenes = [{ title: fromDb.name, description: fromDb.description || '', image: fromDb.tourUrl, credit: '', creditUrl: '', is360: fromDb.tourIs360, haov: 0, yaw: 0, pitch: 0 }];
+        }
+        if (!scenes.length && fromDb?.image) {
+            scenes = [{ title: fromDb.name, description: fromDb.description || '', image: fromDb.image, credit: '', creditUrl: '', is360: false, haov: 120, yaw: 0, pitch: 0 }];
         }
         return {
             slug,
             name: fromDb?.name || fallback.name,
             region: fromDb?.region || fallback.region || '',
-            description: fromDb?.description || '',
-            image: fromDb?.tourUrl && !fromDb.tourIs360 ? fromDb.tourUrl : (fromDb?.image || fallback.image || ''),
-            keywords: fromDb?.keywords || [],
             externalTourUrl: fromDb?.externalTourUrl || fallback.externalTourUrl || '',
             externalTourLabel: fromDb?.externalTourLabel || fallback.externalTourLabel || 'Tour 360° oficial',
             scenes
@@ -249,21 +322,23 @@
         caption.classList.add('show');
     }
 
-    // ---------- navegación ----------
-    function items() {
-        return current.mode === 'tour' ? current.scenes : current.stops.map(([title, description]) => ({ title, description }));
+    function updateCredit(scene) {
+        $('#vt-credit').innerHTML = scene?.credit
+            ? `<i class="fa-solid fa-camera" aria-hidden="true"></i> Foto: ${scene.creditUrl ? `<a href="${esc(scene.creditUrl)}" target="_blank" rel="noopener">${esc(scene.credit)}</a>` : esc(scene.credit)}`
+            : '';
     }
 
+    // ---------- navegación ----------
     function step(delta) {
-        const total = items().length;
+        const total = current?.scenes.length || 0;
         if (!total) return;
         goTo((current.index + delta + total) % total);
     }
 
-    function goTo(index, fromViewer = false) {
+    function goTo(index) {
         if (!current) return;
-        const item = items()[index];
-        if (!item) return;
+        const scene = current.scenes[index];
+        if (!scene) return;
         current.index = index;
         $('#vt-select').value = String(index);
         modal.querySelectorAll('[data-index]').forEach(element => {
@@ -271,24 +346,9 @@
             element.classList.toggle('is-active', active);
             if (active && element.closest('#vt-thumbs')) element.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
         });
-        showCaption(`${index + 1}. ${item.title}`, item.description || '');
-        if (current.mode === 'tour') {
-            updateCredit(item);
-            if (!fromViewer && viewer && viewer.getScene() !== `s${index}`) {
-                modal.classList.add('is-switching');
-                viewer.loadScene(`s${index}`, item.pitch || 0, item.yaw || 0, viewer.getHfov());
-            }
-        } else if (viewer) {
-            viewer.stopAutoRotate();
-            $('#vt-rotate').setAttribute('aria-pressed', 'false');
-            viewer.lookAt(index % 2 ? 3 : -2, current.angles[index], Math.max(30, (current.fitHfov || 70) - 8), 1800);
-        }
-    }
-
-    function updateCredit(scene) {
-        $('#vt-credit').innerHTML = scene?.credit
-            ? `<i class="fa-solid fa-camera" aria-hidden="true"></i> Foto 360°: ${scene.creditUrl ? `<a href="${esc(scene.creditUrl)}" target="_blank" rel="noopener">${esc(scene.credit)}</a>` : esc(scene.credit)}`
-            : '';
+        showCaption(`${index + 1}. ${scene.title}`, scene.description || '');
+        updateCredit(scene);
+        showScene(index);
     }
 
     function stopGuided() {
@@ -301,24 +361,23 @@
     }
 
     function playGuided() {
-        const total = items().length;
+        const total = current?.scenes.length || 0;
         if (!total) return;
         let position = 0;
         const run = () => {
             if (position >= total) { stopGuided(); return; }
             setTime(TIMES[Math.min(TIMES.length - 1, Math.floor((position / total) * TIMES.length))].id);
             goTo(position);
-            if (viewer && current.mode === 'tour') setTimeout(() => viewer?.startAutoRotate(-3), 1200);
             $('#vt-progress-bar').style.width = `${((position + 1) / total) * 100}%`;
             position += 1;
         };
         $('#vt-play').innerHTML = '<i class="fa-solid fa-pause" aria-hidden="true"></i>';
         $('#vt-play').setAttribute('aria-label', 'Pausar recorrido');
         run();
-        guidedTimer = setInterval(run, current.mode === 'tour' ? 8000 : 5200);
+        guidedTimer = setInterval(run, 8000);
     }
 
-    // ---------- configuración de Pannellum ----------
+    // ---------- visor ----------
     function bannerTooltip(div, text) {
         div.classList.add('vt-banner');
         const label = document.createElement('span');
@@ -335,73 +394,104 @@
         div.append(label);
     }
 
-    function tourConfig() {
-        const scenes = {};
+    async function showScene(index) {
+        const token = ++loadToken;
+        const scene = current.scenes[index];
+        modal.classList.add('is-switching');
+        const data = await loadPanorama(sizedImage(scene.image));
+        if (token !== loadToken || !modal.classList.contains('is-open')) return;
+        if (data.failed) {
+            modal.classList.remove('is-loading', 'is-switching');
+            showCaption('No se pudo cargar esta escena', 'Revisa tu conexión o prueba la siguiente.');
+            return;
+        }
+
+        const aspect = data.width / data.height;
+        const box = $('#vt-viewer').getBoundingClientRect();
+        const screenAspect = box.width / Math.max(box.height, 1);
+        const full = scene.is360 && aspect > 1.9 && aspect < 2.1;
+        const haov = full ? 360 : Math.min(360, scene.haov || Math.max(90, Math.round(48 * aspect)));
+        const vaov = full ? 180 : Math.min(150, haov / aspect);
+        const wraps = haov >= 359;
+        // Zoom inicial: el campo vertical visible nunca supera la altura de la foto (sin bandas negras).
+        const rad = Math.PI / 180;
+        const hfovForVertical = 2 * Math.atan(Math.tan((vaov * 0.94 * rad) / 2) * screenAspect) / rad;
+        const fitHfov = full ? (smallScreen() ? 95 : 105) : Math.round(Math.max(12, Math.min(100, hfovForVertical, wraps ? 100 : haov * 0.92)));
+
         const total = current.scenes.length;
-        current.scenes.forEach((scene, index) => {
+        const sideYaw = full || wraps ? 40 : Math.max(10, Math.min(40, haov / 2 - fitHfov / 4));
+        const hotSpots = [{ pitch: full ? 12 : vaov * 0.22, yaw: scene.yaw || 0, type: 'info', cssClass: 'vt-banner-hs', createTooltipFunc: bannerTooltip, createTooltipArgs: scene.title }];
+        if (total > 1) {
             const next = current.scenes[(index + 1) % total];
             const prev = current.scenes[(index - 1 + total) % total];
-            const yaw = scene.yaw || 0;
-            const hotSpots = [{ pitch: 14, yaw, type: 'info', cssClass: 'vt-banner-hs', createTooltipFunc: bannerTooltip, createTooltipArgs: scene.title }];
-            if (total > 1) {
-                hotSpots.push({ pitch: -5, yaw: yaw + 40, type: 'scene', sceneId: `s${(index + 1) % total}`, cssClass: 'vt-nav-hs', createTooltipFunc: navTooltip, createTooltipArgs: { dir: 'next', label: `Ir a: ${next.title}` } });
-                if (total > 2) hotSpots.push({ pitch: -5, yaw: yaw - 40, type: 'scene', sceneId: `s${(index - 1 + total) % total}`, cssClass: 'vt-nav-hs', createTooltipFunc: navTooltip, createTooltipArgs: { dir: 'prev', label: `Volver a: ${prev.title}` } });
-            }
-            scenes[`s${index}`] = { title: scene.title, type: 'equirectangular', panorama: sizedImage(scene.image), yaw, pitch: scene.pitch || 0, hotSpots };
-        });
-        return {
-            default: {
-                firstScene: 's0',
-                sceneFadeDuration: 900,
-                autoLoad: true,
-                autoRotate: -2,
-                autoRotateInactivityDelay: 5000,
-                showControls: false,
-                compass: false,
-                hfov: smallScreen() ? 95 : 105,
-                minHfov: 35,
-                maxHfov: 120,
-                crossOrigin: 'anonymous'
-            },
-            scenes
-        };
-    }
-
-    function panoramaConfig() {
-        let source = current.image;
-        let haov = 120;
-        let vaov = 60;
-        if (/images\.unsplash\.com/.test(source)) {
-            source = `${source.split('?')[0]}?q=80&w=3200&h=1600&fit=crop&auto=format`;
-            haov = 130;
-            vaov = 65;
+            hotSpots.push({ pitch: full ? -5 : -vaov * 0.15, yaw: (scene.yaw || 0) + sideYaw, type: 'info', cssClass: 'vt-nav-hs', createTooltipFunc: navTooltip, createTooltipArgs: { dir: 'next', label: `Ir a: ${next.title}` }, clickHandlerFunc: () => { stopGuided(); step(1); } });
+            if (total > 2) hotSpots.push({ pitch: full ? -5 : -vaov * 0.15, yaw: (scene.yaw || 0) - sideYaw, type: 'info', cssClass: 'vt-nav-hs', createTooltipFunc: navTooltip, createTooltipArgs: { dir: 'prev', label: `Volver a: ${prev.title}` }, clickHandlerFunc: () => { stopGuided(); step(-1); } });
         }
-        const box = $('#vt-viewer').getBoundingClientRect();
-        const fitHfov = Math.round(Math.max(30, Math.min(90, vaov * 0.85 * (box.width / Math.max(box.height, 1)))));
-        current.fitHfov = fitHfov;
-        const span = Math.max(20, haov - 70);
-        current.angles = current.stops.map((_, index, list) => (list.length === 1 ? 0 : -span / 2 + (span / (list.length - 1)) * index));
-        return {
-            type: 'equirectangular', panorama: source, haov, vaov, vOffset: 0,
-            minYaw: -haov / 2, maxYaw: haov / 2, minPitch: -vaov / 2, maxPitch: vaov / 2,
-            autoLoad: true, autoRotate: -2, autoRotateInactivityDelay: 4000, showControls: false, compass: false,
-            hfov: fitHfov, minHfov: 30, maxHfov: fitHfov, crossOrigin: 'anonymous'
+
+        const config = {
+            type: 'equirectangular',
+            panorama: data.url,
+            haov,
+            vaov,
+            vOffset: 0,
+            yaw: scene.yaw || 0,
+            pitch: scene.pitch || 0,
+            hfov: fitHfov,
+            minHfov: full ? 30 : Math.min(30, fitHfov),
+            maxHfov: full ? 120 : fitHfov,
+            autoLoad: true,
+            autoRotate: $('#vt-rotate').getAttribute('aria-pressed') === 'true' ? -2 : 0,
+            autoRotateInactivityDelay: 5000,
+            showControls: false,
+            compass: false,
+            hotSpots
         };
+        if (!full) {
+            config.minPitch = -vaov / 2;
+            config.maxPitch = vaov / 2;
+            if (!wraps) {
+                config.minYaw = -haov / 2;
+                config.maxYaw = haov / 2;
+            }
+        }
+        if (!data.local) config.crossOrigin = 'anonymous';
+
+        try {
+            await loadPannellum();
+            if (token !== loadToken) return;
+            try { viewer?.destroy(); } catch (error) { /* ya destruido */ }
+            viewer = window.pannellum.viewer('vt-viewer', config);
+            viewer.on('load', () => {
+                if (token !== loadToken) return;
+                modal.classList.remove('is-loading', 'is-switching');
+                $('#vt-gyro').hidden = !viewer.isOrientationSupported();
+            });
+            viewer.on('error', () => {
+                modal.classList.remove('is-loading', 'is-switching');
+                showCaption('No se pudo mostrar esta escena', 'Prueba con la siguiente.');
+            });
+            viewer.on('mousedown', stopGuided);
+            viewer.on('touchstart', stopGuided);
+            // Precarga la siguiente escena para que el cambio sea instantáneo
+            const nextScene = current.scenes[(index + 1) % current.scenes.length];
+            if (nextScene) loadPanorama(sizedImage(nextScene.image));
+        } catch (error) {
+            modal.classList.remove('is-loading', 'is-switching');
+            showCaption('No se pudo abrir la visita', error.message);
+        }
     }
 
     function renderNavigation() {
-        const list = items();
-        $('#vt-select').innerHTML = list.map((item, index) => `<option value="${index}">${index + 1}. ${esc(item.title)}</option>`).join('');
-        $('#vt-list-items').innerHTML = list.map((item, index) => `<li><button type="button" data-index="${index}"><span class="vt-num">${index + 1}</span>${esc(item.title)}</button></li>`).join('');
-        $('#vt-thumbs').innerHTML = current.mode === 'tour'
-            ? list.map((item, index) => `<button type="button" class="vt-thumb" data-index="${index}" aria-label="${index + 1}. ${esc(item.title)}"><img src="${esc(thumbImage(item.image))}" alt="" loading="lazy" decoding="async"><span>${index + 1}. ${esc(item.title)}</span></button>`).join('')
-            : list.map((item, index) => `<button type="button" class="vt-chip" data-index="${index}"><span class="vt-num">${index + 1}</span> ${esc(item.title)}</button>`).join('');
+        const scenes = current.scenes;
+        $('#vt-select').innerHTML = scenes.map((scene, index) => `<option value="${index}">${index + 1}. ${esc(scene.title)}</option>`).join('');
+        $('#vt-list-items').innerHTML = scenes.map((scene, index) => `<li><button type="button" data-index="${index}"><span class="vt-num">${index + 1}</span>${esc(scene.title)}</button></li>`).join('');
+        $('#vt-thumbs').innerHTML = scenes.map((scene, index) => `<button type="button" class="vt-thumb" data-index="${index}" aria-label="${index + 1}. ${esc(scene.title)}"><img src="${esc(thumbImage(scene.image))}" alt="" loading="lazy" decoding="async"><span>${index + 1}. ${esc(scene.title)}${scene.is360 ? ' · 360°' : ''}</span></button>`).join('');
         modal.querySelectorAll('[data-index]').forEach(element => element.addEventListener('click', () => {
             stopGuided();
             goTo(Number(element.dataset.index));
             if (element.closest('#vt-list')) togglePanel('#vt-list', '#vt-btn-list');
         }));
-        const multiple = list.length > 1;
+        const multiple = scenes.length > 1;
         $('#vt-prev').hidden = !multiple;
         $('#vt-next').hidden = !multiple;
     }
@@ -414,58 +504,38 @@
         $('#vt-close').focus();
 
         const destination = await resolveDestination(slug);
-        if (!destination) { closeTour(); return; }
-        const mode = destination.scenes.length ? 'tour' : 'panorama';
-        current = { ...destination, mode, index: 0, stops: STOPS[slug] || [[destination.name, destination.description || 'Explora el destino con tu guía.']] };
-
+        if (!destination || !destination.scenes.length) {
+            showCaption('Este destino aún no tiene visita virtual', 'Pronto agregaremos fotos 360°.');
+            modal.classList.remove('is-loading');
+            return;
+        }
+        current = { ...destination, index: 0 };
+        const fullCount = destination.scenes.filter(scene => scene.is360).length;
         $('#vt-title').textContent = destination.name;
-        const region = destination.region ? `${destination.region} · ` : '';
-        $('#vt-subtitle').textContent = mode === 'tour' ? `${region}Perú · ${destination.scenes.length} escenas 360°` : `${region}Perú · vista panorámica`;
+        $('#vt-subtitle').textContent = `${destination.region ? `${destination.region} · ` : ''}Perú · ${destination.scenes.length} escenas${fullCount ? ` · ${fullCount} en 360°` : ' panorámicas'}`;
         const external = $('#vt-external');
         external.hidden = !destination.externalTourUrl;
         if (destination.externalTourUrl) {
             external.href = destination.externalTourUrl;
             external.querySelector('span').textContent = destination.externalTourLabel;
         }
-        $('#vt-credit').innerHTML = '';
-        $('.vt-caption').classList.remove('show');
         setTime('mediodia');
         renderNavigation();
-
-        try {
-            await loadPannellum();
-            viewer?.destroy();
-            viewer = window.pannellum.viewer('vt-viewer', mode === 'tour' ? tourConfig() : panoramaConfig());
-            viewer.on('load', () => {
-                modal.classList.remove('is-loading', 'is-switching');
-                $('#vt-gyro').hidden = !viewer.isOrientationSupported();
-            });
-            viewer.on('scenechange', sceneId => {
-                const index = Number(String(sceneId).slice(1)) || 0;
-                if (index !== current.index) goTo(index, true);
-            });
-            viewer.on('error', () => {
-                modal.classList.remove('is-loading', 'is-switching');
-                showCaption('No se pudo cargar la imagen de la visita', 'Revisa tu conexión o prueba otra escena.');
-            });
-            viewer.on('mousedown', stopGuided);
-            viewer.on('touchstart', stopGuided);
-            goTo(0);
-        } catch (error) {
-            modal.classList.remove('is-loading');
-            showCaption('No se pudo abrir la visita', error.message);
-        }
+        goTo(0);
     }
 
     function closeTour() {
         stopGuided();
+        loadToken += 1;
         if (!modal) return;
         if (document.fullscreenElement) document.exitFullscreen?.();
         modal.classList.remove('is-open', 'is-loading', 'is-switching');
         document.body.classList.remove('modal-open');
         try { viewer?.stopOrientation(); } catch (error) { /* sin giroscopio */ }
-        viewer?.destroy();
+        try { viewer?.destroy(); } catch (error) { /* ya destruido */ }
         viewer = null;
+        blobCache.forEach(entry => { if (entry.local) URL.revokeObjectURL(entry.url); });
+        blobCache.clear();
     }
 
     function destinationForText(text) {

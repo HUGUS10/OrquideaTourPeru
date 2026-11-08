@@ -9,7 +9,7 @@
     }
 
     function mapPackage(row) {
-        const image = row.image_url || (row.image_path ? client.storage.from('package-images').getPublicUrl(row.image_path).data.publicUrl : '');
+        const image = fixPhoto(row.image_url) || (row.image_path ? client.storage.from('package-images').getPublicUrl(row.image_path).data.publicUrl : '');
         return {
             id: row.id,
             name: row.name,
@@ -126,8 +126,20 @@
         return ['admin', 'cajero', 'agente', 'rrhh', 'atencion'].find(role => roles.includes(role)) || 'client';
     }
 
+    // Fotos antiguas que no correspondían al lugar → reemplazo por fotos reales libres.
+    const W = 'https://upload.wikimedia.org/wikipedia/commons/thumb/';
+    const PHOTO_FIXES = {
+        '1589553416260-f586c8f1514f': W + '7/7a/Colca_Valley_Panorama.jpg/1280px-Colca_Valley_Panorama.jpg',
+        '1509316975850-ff9c5deb0cd9': W + 'b/b8/Vista_panor%C3%A0mica_de_Huacachina.jpg/1280px-Vista_panor%C3%A0mica_de_Huacachina.jpg',
+        '1544735716-392fe2489ffa': W + 'c/c7/Islas_flotantes_de_los_Uros%2C_Lago_Titicaca%2C_Per%C3%BA%2C_2015-08-01%2C_DD_44-48_PAN.jpg/1280px-Islas_flotantes_de_los_Uros%2C_Lago_Titicaca%2C_Per%C3%BA%2C_2015-08-01%2C_DD_44-48_PAN.jpg'
+    };
+    function fixPhoto(url) {
+        const key = Object.keys(PHOTO_FIXES).find(id => String(url || '').includes(id));
+        return key ? PHOTO_FIXES[key] : url;
+    }
+
     function mapDestination(row) {
-        const image = row.image_url || (row.image_path ? client.storage.from('package-images').getPublicUrl(row.image_path).data.publicUrl : '');
+        const image = fixPhoto(row.image_url) || (row.image_path ? client.storage.from('package-images').getPublicUrl(row.image_path).data.publicUrl : '');
         return {
             id: row.id,
             slug: row.slug,
@@ -209,7 +221,10 @@
             creditUrl: row.credit_url || '',
             yaw: Number(row.initial_yaw) || 0,
             pitch: Number(row.initial_pitch) || 0,
-            order: row.sort_order
+            order: row.sort_order,
+            is360: 'is_360' in row ? Boolean(row.is_360) : true,
+            haov: Number(row.haov) || 0,
+            hasTypeColumns: 'is_360' in row
         };
     }
 
@@ -232,7 +247,9 @@
             credit_url: scene.creditUrl || null,
             initial_yaw: Number(scene.yaw) || 0,
             initial_pitch: Number(scene.pitch) || 0,
-            sort_order: Number(scene.order) || 0
+            sort_order: Number(scene.order) || 0,
+            is_360: scene.is360 !== false,
+            haov: scene.is360 === false ? (Number(scene.haov) || null) : null
         };
         if (scene.id) values.id = scene.id;
         return mapScene(throwIfError(await client.from('tour_scenes').upsert(values).select('*').single()));

@@ -832,13 +832,15 @@ function renderSceneManager() {
             <label class="text-xs text-slate-300">Crédito / autor (opcional)<input name="credit" maxlength="160" class="${INPUT}"></label>
             <label class="text-xs text-slate-300 sm:col-span-2">Enlace del crédito (opcional)<input name="creditUrl" type="url" maxlength="500" class="${INPUT}"></label>
             <label class="text-xs text-slate-300">Ángulo inicial (−180 a 180°)<input name="yaw" type="number" min="-180" max="180" value="0" class="${INPUT}"></label>
+            <label class="text-xs text-slate-300">Tipo de foto<select name="is360" class="${INPUT}"><option value="1">360° completa (esfera, proporción 2:1)</option><option value="0">Panorámica amplia</option></select></label>
+            <label class="text-xs text-slate-300">Ángulo horizontal si es panorámica (°)<input name="haov" type="number" min="30" max="360" placeholder="Ej.: 180" class="${INPUT}"></label>
             <div class="flex items-end gap-2"><button type="button" onclick="document.getElementById('scene-form').reset(); document.getElementById('scene-form').elements.id.value='';" class="${BTN_SECONDARY}">Limpiar</button><button type="submit" class="${BTN_PRIMARY} flex-1"><i class="fa-solid fa-floppy-disk mr-2" aria-hidden="true"></i>Guardar escena</button></div>
         </form>
         ${scenes.length ? `<ol class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">${scenes.map(scene => `<li class="flex gap-3 bg-slate-900 border border-slate-700 rounded-xl p-2.5">
             <img src="${escapeHtml(scene.image.replace(/\/\d+px-/, '/1280px-'))}" alt="" loading="lazy" class="w-28 h-16 object-cover rounded-lg bg-slate-800 shrink-0">
             <div class="min-w-0 flex-1 text-xs">
                 <p class="font-bold text-white truncate">${Number(scene.order)}. ${escapeHtml(scene.title)}</p>
-                <p class="text-slate-400 truncate">${escapeHtml(scene.credit || 'Foto propia')}</p>
+                <p class="text-slate-400 truncate">${scene.is360 === false ? 'Panorámica' : '360°'} · ${escapeHtml(scene.credit || 'Foto propia')}</p>
                 <div class="flex gap-3 mt-1.5"><button type="button" onclick="editScene('${escapeHtml(scene.id)}')" class="text-sky-300 font-bold">Editar</button><button type="button" onclick="removeScene('${escapeHtml(scene.id)}')" class="text-rose-300 font-bold">Eliminar</button></div>
             </div>
         </li>`).join('')}</ol>` : '<p class="text-sm text-slate-400">Este destino aún no tiene escenas. Mientras tanto se muestra la vista panorámica.</p>'}`;
@@ -865,7 +867,7 @@ function editScene(sceneId) {
     const scene = sceneState.scenes.find(item => item.id === sceneId);
     const form = document.getElementById('scene-form');
     if (!scene || !form) return;
-    Object.entries({ id: scene.id, title: scene.title, order: scene.order, description: scene.description, image: scene.image, credit: scene.credit, creditUrl: scene.creditUrl, yaw: scene.yaw })
+    Object.entries({ id: scene.id, title: scene.title, order: scene.order, description: scene.description, image: scene.image, credit: scene.credit, creditUrl: scene.creditUrl, yaw: scene.yaw, is360: scene.is360 === false ? '0' : '1', haov: scene.haov || '' })
         .forEach(([name, value]) => { form.elements[name].value = value ?? ''; });
     form.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
@@ -887,7 +889,9 @@ async function saveSceneForm(form) {
             credit: form.elements.credit.value.trim(),
             creditUrl,
             yaw: Number(form.elements.yaw.value) || 0,
-            order: Number(form.elements.order.value) || 0
+            order: Number(form.elements.order.value) || 0,
+            is360: form.elements.is360.value === '1',
+            haov: Number(form.elements.haov.value) || 0
         });
         const exists = sceneState.scenes.some(item => item.id === saved.id);
         sceneState.scenes = (exists ? sceneState.scenes.map(item => item.id === saved.id ? saved : item) : [...sceneState.scenes, saved]).sort((a, b) => a.order - b.order);
