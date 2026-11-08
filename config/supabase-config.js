@@ -1,6 +1,6 @@
 (() => {
-    const supabaseUrl = 'https://rncdodmxldwcbtcrqdph.supabase.co';
-    const supabasePublishableKey = 'sb_publishable_tM1YnpuzvteyuLzp7ZDEww_sO8FqpAU';
+    const supabaseUrl = 'https://vghjkfusauakqzkzsqes.supabase.co';
+    const supabasePublishableKey = 'sb_publishable_iXSx2FFe9_U0UhiZ7pGf3w_k6NdGJ5E';
 
     if (!window.supabase?.createClient) {
         throw new Error('No se pudo cargar el cliente de Supabase.');

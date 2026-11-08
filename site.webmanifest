@@ -1,0 +1,19 @@
+{
+    "name": "Orquídea Tour Perú",
+    "short_name": "Orquídea Tour",
+    "description": "Paquetes turísticos y reservas en Perú.",
+    "lang": "es-PE",
+    "start_url": "./index.html",
+    "scope": "./",
+    "display": "standalone",
+    "background_color": "#f8fafc",
+    "theme_color": "#16a34a",
+    "icons": [
+        {
+            "src": "img/logo.png",
+            "sizes": "447x447",
+            "type": "image/jpeg",
+            "purpose": "any"
+        }
+    ]
+}

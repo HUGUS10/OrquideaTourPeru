@@ -205,17 +205,105 @@
         }
 
         // Modales
+        let lastFocusedBeforeModal = null;
+
         function openModal(modalId) {
-            document.getElementById(modalId).classList.remove('hidden');
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+            lastFocusedBeforeModal = document.activeElement;
+            modal.classList.remove('hidden');
+            document.body.classList.add('modal-open');
+            const focusTarget = modal.querySelector('button, [href], input:not([readonly]), select, textarea');
+            focusTarget?.focus({ preventScroll: true });
         }
 
         function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+            modal.classList.add('hidden');
+            if (!document.querySelector('[data-modal]:not(.hidden)')) document.body.classList.remove('modal-open');
+            lastFocusedBeforeModal?.focus?.({ preventScroll: true });
         }
+
+        // Cerrar modales con Escape o al tocar el fondo
+        document.addEventListener('keydown', event => {
+            if (event.key !== 'Escape') return;
+            const openModalEl = [...document.querySelectorAll('[data-modal]:not(.hidden)')].pop();
+            if (openModalEl) closeModal(openModalEl.id);
+            else if (!document.getElementById('mobile-menu')?.classList.contains('hidden')) closeMobileMenu();
+        });
+        document.addEventListener('click', event => {
+            if (event.target.matches?.('[data-modal]')) closeModal(event.target.id);
+        });
 
         // Scroll suave
         function scrollToSection(id) {
-            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+            document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Fecha local en formato YYYY-MM-DD (evita desfases por zona horaria)
+        function localIsoDate(offsetDays = 0) {
+            const date = new Date();
+            date.setDate(date.getDate() + offsetDays);
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        }
+
+        // Filtro de paquetes por destino (buscador y tarjetas de destino)
+        const DESTINATION_LABELS = { cusco: 'Cusco & Machu Picchu', arequipa: 'Arequipa & Colca', ica: 'Ica, Paracas & Huacachina', puno: 'Puno & Lago Titicaca' };
+        const DESTINATION_KEYWORDS = { cusco: ['cusco', 'machu', 'picchu', 'valle sagrado'], arequipa: ['arequipa', 'colca'], ica: ['ica', 'paracas', 'huacachina', 'ballestas'], puno: ['puno', 'titicaca', 'uros'] };
+        let activeDestinationFilter = '';
+        let searchPreferences = { date: '', people: '' };
+
+        function normalizeText(value) {
+            return String(value || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+        }
+
+        function applyPackageFilter() {
+            const catalog = document.getElementById('package-catalog');
+            const bar = document.getElementById('package-filter-bar');
+            if (!catalog) return;
+            const cards = [...catalog.querySelectorAll('article')];
+            let visible = 0;
+            cards.forEach(card => {
+                const haystack = normalizeText(`${card.dataset.destination || ''} ${card.textContent}`);
+                const match = !activeDestinationFilter || DESTINATION_KEYWORDS[activeDestinationFilter].some(word => haystack.includes(word));
+                card.classList.toggle('hidden', !match);
+                if (match) visible += 1;
+            });
+            let empty = document.getElementById('package-filter-empty');
+            if (activeDestinationFilter && !visible) {
+                if (!empty) {
+                    empty = document.createElement('p');
+                    empty.id = 'package-filter-empty';
+                    empty.className = 'col-span-full py-10 text-center text-slate-600';
+                    catalog.append(empty);
+                }
+                empty.innerHTML = 'Por ahora no tenemos paquetes publicados para este destino. <a class="font-bold text-brand-700 underline" target="_blank" rel="noopener" href="https://wa.me/51989851245">Escríbenos por WhatsApp</a> y armamos tu viaje.';
+            } else {
+                empty?.remove();
+            }
+            if (bar) {
+                bar.classList.toggle('hidden', !activeDestinationFilter);
+                const label = document.getElementById('package-filter-label');
+                if (label) label.textContent = activeDestinationFilter ? `Mostrando paquetes para: ${DESTINATION_LABELS[activeDestinationFilter]} (${visible})` : '';
+            }
+        }
+
+        function filterPackagesByDestination(destination) {
+            activeDestinationFilter = DESTINATION_KEYWORDS[destination] ? destination : '';
+            const select = document.getElementById('search-destination');
+            if (select) select.value = activeDestinationFilter;
+            applyPackageFilter();
+            scrollToSection('paquetes');
+        }
+
+        function clearPackageFilter() {
+            filterPackagesByDestination('');
+        }
+
+        function searchPackages(form) {
+            searchPreferences = { date: form.elements.date?.value || '', people: form.elements.people?.value || '' };
+            filterPackagesByDestination(form.elements.destination?.value || '');
         }
 
         // Detalle del paquete modal
@@ -225,8 +313,14 @@
             document.getElementById('detail-duration').innerText = duration;
             document.getElementById('detail-price').innerText = `S/ ${price}`;
             document.getElementById('detail-stock').innerText = `${stock} cupos libres`;
-            document.getElementById('detail-img').src = img;
-            
+            const detailImage = document.getElementById('detail-img');
+            detailImage.src = img;
+            detailImage.alt = `${title} - ${dest}`;
+            ['detail-includes', 'detail-excludes'].forEach(id => {
+                const container = document.getElementById(id);
+                if (container) container.innerHTML = '<p class="text-slate-500">Consúltanos por WhatsApp para más detalles.</p>';
+            });
+
             document.getElementById('btn-modal-reserve').onclick = function() {
                 closeModal('modal-package-detail');
                 selectPackageForBooking(title, price, stock);
@@ -237,12 +331,28 @@
 
         // Iniciar proceso de reserva
         function selectPackageForBooking(name, price, stock, packageId = '') {
+            if (!isClientAuthenticated && !isAdminAuthenticated) {
+                showToast('Inicia sesión o regístrate para reservar este paquete.', 'amber');
+                const gate = document.getElementById('auth-gate');
+                if (gate) gate.classList.remove('hidden');
+                else navigatePage('login.html');
+                return;
+            }
             currentSelectedPackage = { id: packageId, name, price, stock };
-            
+
             document.getElementById('book-pkg-name').innerText = name;
             document.getElementById('book-pkg-price-label').innerText = `S/ ${price} por persona`;
             document.getElementById('book-availability-badge').innerText = `${stock} cupos disponibles`;
-            document.getElementById('book-date').min = new Date().toISOString().slice(0, 10);
+            const holder = document.getElementById('book-holder');
+            const holderDocument = document.getElementById('book-document');
+            if (holder) holder.value = currentUser.name || '';
+            if (holderDocument) holderDocument.value = currentUser.document || '';
+            const dateInput = document.getElementById('book-date');
+            dateInput.min = localIsoDate();
+            if (searchPreferences.date && searchPreferences.date >= dateInput.min) dateInput.value = searchPreferences.date;
+            else if (!dateInput.value || dateInput.value < dateInput.min) dateInput.value = localIsoDate(1);
+            const passengersSelect = document.getElementById('book-passengers');
+            if (searchPreferences.people && passengersSelect.querySelector(`option[value="${searchPreferences.people}"]`)) passengersSelect.value = searchPreferences.people;
 
             // Reset pasos
             document.getElementById('booking-step-1').classList.remove('hidden');
@@ -273,7 +383,7 @@
                 showToast('No hay suficientes cupos para esa cantidad de personas.', 'rose');
                 return;
             }
-            if (date < new Date().toISOString().slice(0, 10)) {
+            if (!date || date < localIsoDate()) {
                 showToast('Selecciona una fecha de viaje futura.', 'rose');
                 return;
             }
@@ -281,7 +391,7 @@
 
             document.getElementById('summary-pkg').innerText = currentSelectedPackage.name;
             document.getElementById('summary-date').innerText = date;
-            document.getElementById('summary-passengers').innerText = `${passengers} personas`;
+            document.getElementById('summary-passengers').innerText = `${passengers} ${passengers === 1 ? 'persona' : 'personas'}`;
             document.getElementById('summary-unit-price').innerText = `S/ ${currentSelectedPackage.price}`;
             document.getElementById('summary-total-price').innerText = `S/ ${total.toLocaleString()}`;
 
@@ -294,7 +404,14 @@
             document.getElementById('booking-step-1').classList.remove('hidden');
         }
 
+        let bookingInProgress = false;
         async function confirmBookingFinal() {
+            if (bookingInProgress) return;
+            if (!currentUser.id) {
+                showToast('Tu sesión expiró. Inicia sesión nuevamente.', 'rose');
+                return;
+            }
+            bookingInProgress = true;
             const passengers = parseInt(document.getElementById('book-passengers').value);
             const bookingCode = `RES-${crypto.randomUUID().replaceAll('-', '').slice(0, 10).toUpperCase()}`;
             try {
@@ -317,6 +434,8 @@
                 showToast(`Reserva ${booking.code} guardada en Supabase.`);
             } catch (error) {
                 showToast(error.message || 'No se pudo guardar la reserva.', 'rose');
+            } finally {
+                bookingInProgress = false;
             }
         }
 
@@ -479,10 +598,11 @@
                 const price = packagePrice(packageItem);
                 const image = packageImageUrl(packageItem.image) || 'https://images.unsplash.com/photo-1526392060635-9d6019884377?q=80&w=800&auto=format&fit=crop';
                 return `<article class="bg-white rounded-xl overflow-hidden border border-slate-200 shadow-sm flex flex-col">
-                    <div class="relative"><img src="${escapeHtml(image)}" alt="${escapeHtml(packageItem.name)}" loading="lazy" class="w-full h-52 object-cover">${promotion ? `<span class="absolute top-3 left-3 bg-rose-600 text-white text-xs font-bold px-3 py-1 rounded-full">${escapeHtml(promotion.title)} · -${promotion.discount}%</span>` : ''}<span class="absolute top-3 right-3 bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full">${Number(packageItem.stock)} cupos</span></div>
-                    <div class="p-5 flex flex-1 flex-col"><div class="flex justify-between gap-3 text-xs text-slate-500"><span><i class="fa-solid fa-clock text-brand-600 mr-1"></i>${escapeHtml(packageItem.duration)}</span><span><i class="fa-solid fa-location-dot text-brand-600 mr-1"></i>${escapeHtml(packageItem.destination)}</span></div><h3 class="text-lg font-bold text-slate-900 mt-3">${escapeHtml(packageItem.name)}</h3><p class="text-sm text-slate-600 mt-2 flex-1">${escapeHtml(packageItem.description)}</p><div class="flex items-end justify-between gap-3 border-t border-slate-100 mt-4 pt-4"><div><span class="text-xs text-slate-400 block">Precio por persona</span>${promotion ? `<span class="text-xs text-slate-400 line-through">S/ ${Number(packageItem.price).toLocaleString('es-PE')}</span>` : ''}<span class="block text-2xl font-extrabold text-brand-700">S/ ${price.toLocaleString('es-PE')}</span></div><button type="button" onclick="openPublicPackageDetails('${escapeHtml(packageItem.id)}')" class="text-brand-700 font-bold text-sm">Detalles</button></div><button type="button" onclick="bookPublicPackage('${escapeHtml(packageItem.id)}')" class="w-full mt-4 bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-lg"><i class="fa-solid fa-ticket mr-2"></i>Reservar</button></div>
+                    <div class="relative"><img src="${escapeHtml(image)}" alt="${escapeHtml(`${packageItem.name} - ${packageItem.destination}`)}" width="600" height="400" loading="lazy" decoding="async" class="w-full h-52 object-cover">${promotion ? `<span class="absolute top-3 left-3 bg-rose-600 text-white text-xs font-bold px-3 py-1 rounded-full">${escapeHtml(promotion.title)} · -${promotion.discount}%</span>` : ''}<span class="absolute top-3 right-3 bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full">${Number(packageItem.stock)} cupos</span></div>
+                    <div class="p-5 flex flex-1 flex-col"><div class="flex justify-between gap-3 text-xs text-slate-500"><span><i class="fa-solid fa-clock text-brand-600 mr-1"></i>${escapeHtml(packageItem.duration)}</span><span><i class="fa-solid fa-location-dot text-brand-600 mr-1"></i>${escapeHtml(packageItem.destination)}</span></div><h3 class="text-lg font-bold text-slate-900 mt-3">${escapeHtml(packageItem.name)}</h3><p class="text-sm text-slate-600 mt-2 flex-1">${escapeHtml(packageItem.description)}</p><div class="flex items-end justify-between gap-3 border-t border-slate-100 mt-4 pt-4"><div><span class="text-xs text-slate-400 block">Precio por persona</span>${promotion ? `<span class="text-xs text-slate-400 line-through">S/ ${Number(packageItem.price).toLocaleString('es-PE')}</span>` : ''}<span class="block text-2xl font-extrabold text-brand-700">S/ ${price.toLocaleString('es-PE')}</span></div><button type="button" onclick="openPublicPackageDetails('${escapeHtml(packageItem.id)}')" class="text-brand-700 font-bold text-sm py-2">Detalles</button></div><button type="button" onclick="bookPublicPackage('${escapeHtml(packageItem.id)}')" class="w-full mt-4 bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-lg"><i class="fa-solid fa-ticket mr-2"></i>Reservar</button></div>
                 </article>`;
             }).join('') : '<p class="col-span-full py-10 text-center text-slate-500">No hay paquetes publicados en este momento.</p>';
+            applyPackageFilter();
         }
 
         function bookPublicPackage(packageId) {
@@ -1121,4 +1241,13 @@
             }
             console.error('Supabase initialization failed:', error);
         });
-    
+
+        // Ajustes iniciales de la página pública
+        (function initPublicPage() {
+            const year = document.getElementById('current-year');
+            if (year) year.textContent = new Date().getFullYear();
+            const searchDate = document.getElementById('search-date');
+            if (searchDate) searchDate.min = localIsoDate();
+            const bookDate = document.getElementById('book-date');
+            if (bookDate) bookDate.min = localIsoDate();
+        })();

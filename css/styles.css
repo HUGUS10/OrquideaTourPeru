@@ -1,32 +1,140 @@
+/* ===== Base responsive ===== */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5.5rem; /* compensa el header fijo al saltar a #secciones */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
+  -webkit-tap-highlight-color: transparent;
+}
+
+img,
+video,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Bloquea el scroll del fondo cuando hay un modal abierto */
+body.modal-open {
+  overflow: hidden;
+  touch-action: none;
+}
+
+body.modal-open [data-modal] {
+  touch-action: auto;
+}
+
+/* Respeta el notch / barra inferior en iPhone */
+#toast-container {
+  bottom: max(1.25rem, env(safe-area-inset-bottom));
+}
+
+[data-modal] > div {
+  padding-bottom: max(0px, env(safe-area-inset-bottom));
+}
+
+/* ===== Accesibilidad ===== */
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -100px;
+  z-index: 200;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: #15803d;
+  color: #fff;
+  font-weight: 700;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+:focus-visible {
+  outline: 3px solid #22c55e;
+  outline-offset: 2px;
+}
+
+/* Evita que iOS haga zoom al enfocar campos (necesita >=16px) */
+@media (max-width: 639px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* ===== Fondos ===== */
 .gradient-hero {
-/* Fondos */
-  background: linear-gradient(rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.75)), url('https://images.unsplash.com/photo-1526392060635-9d6019884377?q=80&w=1920&auto=format&fit=crop');
+  background-color: #0f172a;
+  background-image: linear-gradient(rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.75)), url('https://images.unsplash.com/photo-1526392060635-9d6019884377?q=75&w=1280&auto=format&fit=crop');
   background-size: cover;
-  background-position: center;}
+  background-position: center;
+}
+
+@media (min-width: 1280px) {
+  .gradient-hero {
+    background-image: linear-gradient(rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.75)), url('https://images.unsplash.com/photo-1526392060635-9d6019884377?q=75&w=1920&auto=format&fit=crop');
+  }
+}
 
 .glass-card {
-/* Fondos */
   background: rgba(255, 255, 255, 0.95);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
 
-  /* Otras propiedades */
-  backdrop-filter: blur(10px);}
-
+/* ===== Scrollbar ===== */
 ::-webkit-scrollbar {
-/* Dimensiones */
   width: 8px;
-  height: 8px;}
+  height: 8px;
+}
 
 ::-webkit-scrollbar-track {
-/* Fondos */
-  background: #f1f5f9;}
+  background: #f1f5f9;
+}
 
 ::-webkit-scrollbar-thumb {
-/* Bordes */
   border-radius: 4px;
-
-  /* Fondos */
-  background: #cbd5e1;}
+  background: #cbd5e1;
+}
 
 ::-webkit-scrollbar-thumb:hover {
-/* Fondos */
-  background: #94a3b8;}
+  background: #94a3b8;
+}
+
+/* ===== Movimiento reducido ===== */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== Impresión (comprobantes / pasajes) ===== */
+@media print {
+  header,
+  footer,
+  nav,
+  #toast-container,
+  .skip-link {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+  }
+}

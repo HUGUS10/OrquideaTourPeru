@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /html/admin.html
+Disallow: /html/admin_cliente.html
+Disallow: /html/pasajes.html
+Disallow: /html/boletas.html
+Disallow: /config/
+Disallow: /database/
+
+Sitemap: https://orquideatourperu.vercel.app/sitemap.xml

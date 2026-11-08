@@ -211,36 +211,47 @@ alter table public.promotions enable row level security;
 alter table public.bookings enable row level security;
 alter table public.receipts enable row level security;
 
+drop policy if exists "profiles_select_self_or_admin" on public.profiles;
 create policy "profiles_select_self_or_admin" on public.profiles
 for select to authenticated using (user_id = auth.uid() or public.is_admin());
+drop policy if exists "profiles_insert_self" on public.profiles;
 create policy "profiles_insert_self" on public.profiles
 for insert to authenticated with check (user_id = auth.uid());
+drop policy if exists "profiles_update_self_or_admin" on public.profiles;
 create policy "profiles_update_self_or_admin" on public.profiles
 for update to authenticated using (user_id = auth.uid() or public.is_admin())
 with check (user_id = auth.uid() or public.is_admin());
 
+drop policy if exists "roles_select_self_or_admin" on public.user_roles;
 create policy "roles_select_self_or_admin" on public.user_roles
 for select to authenticated using (user_id = auth.uid() or public.is_admin());
+drop policy if exists "roles_admin_manage" on public.user_roles;
 create policy "roles_admin_manage" on public.user_roles
 for all to authenticated using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists "packages_public_read_published" on public.packages;
 create policy "packages_public_read_published" on public.packages
 for select to anon, authenticated using (is_published or public.is_admin());
+drop policy if exists "packages_admin_manage" on public.packages;
 create policy "packages_admin_manage" on public.packages
 for all to authenticated using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists "promotions_public_read_active" on public.promotions;
 create policy "promotions_public_read_active" on public.promotions
 for select to anon, authenticated using (
     is_active and current_date between starts_on and ends_on
     and exists (select 1 from public.packages p where p.id = package_id and p.is_published)
     or public.is_admin()
 );
+drop policy if exists "promotions_admin_manage" on public.promotions;
 create policy "promotions_admin_manage" on public.promotions
 for all to authenticated using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists "bookings_select_owner_or_admin" on public.bookings;
 create policy "bookings_select_owner_or_admin" on public.bookings
 for select to authenticated using (user_id = auth.uid() or public.is_admin());
 drop policy if exists "bookings_client_create_pending" on public.bookings;
+drop policy if exists "bookings_admin_update" on public.bookings;
 create policy "bookings_admin_update" on public.bookings
 for update to authenticated using (public.is_admin()) with check (public.is_admin());
 
@@ -341,8 +352,10 @@ $$;
 revoke all on function public.cancel_booking(uuid) from public;
 grant execute on function public.cancel_booking(uuid) to authenticated;
 
+drop policy if exists "receipts_select_owner_or_admin" on public.receipts;
 create policy "receipts_select_owner_or_admin" on public.receipts
 for select to authenticated using (user_id = auth.uid() or public.is_admin());
+drop policy if exists "receipts_admin_issue" on public.receipts;
 create policy "receipts_admin_issue" on public.receipts
 for insert to authenticated with check (public.is_admin() and issued_by = auth.uid());
 
@@ -352,22 +365,30 @@ values
     ('profile-avatars', 'profile-avatars', true, 2097152, array['image/jpeg','image/png','image/webp'])
 on conflict (id) do update set public = excluded.public, file_size_limit = excluded.file_size_limit, allowed_mime_types = excluded.allowed_mime_types;
 
+drop policy if exists "package_images_public_read" on storage.objects;
 create policy "package_images_public_read" on storage.objects
 for select to anon, authenticated using (bucket_id = 'package-images');
+drop policy if exists "package_images_admin_insert" on storage.objects;
 create policy "package_images_admin_insert" on storage.objects
 for insert to authenticated with check (bucket_id = 'package-images' and public.is_admin());
+drop policy if exists "package_images_admin_update" on storage.objects;
 create policy "package_images_admin_update" on storage.objects
 for update to authenticated using (bucket_id = 'package-images' and public.is_admin()) with check (bucket_id = 'package-images' and public.is_admin());
+drop policy if exists "package_images_admin_delete" on storage.objects;
 create policy "package_images_admin_delete" on storage.objects
 for delete to authenticated using (bucket_id = 'package-images' and public.is_admin());
 
+drop policy if exists "profile_avatars_public_read" on storage.objects;
 create policy "profile_avatars_public_read" on storage.objects
 for select to anon, authenticated using (bucket_id = 'profile-avatars');
+drop policy if exists "profile_avatars_owner_insert" on storage.objects;
 create policy "profile_avatars_owner_insert" on storage.objects
 for insert to authenticated with check (bucket_id = 'profile-avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+drop policy if exists "profile_avatars_owner_update" on storage.objects;
 create policy "profile_avatars_owner_update" on storage.objects
 for update to authenticated using (bucket_id = 'profile-avatars' and ((storage.foldername(name))[1] = auth.uid()::text or public.is_admin()))
 with check (bucket_id = 'profile-avatars' and ((storage.foldername(name))[1] = auth.uid()::text or public.is_admin()));
+drop policy if exists "profile_avatars_owner_delete" on storage.objects;
 create policy "profile_avatars_owner_delete" on storage.objects
 for delete to authenticated using (bucket_id = 'profile-avatars' and ((storage.foldername(name))[1] = auth.uid()::text or public.is_admin()));
 

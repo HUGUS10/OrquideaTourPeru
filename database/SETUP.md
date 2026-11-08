@@ -2,7 +2,7 @@
 
 ## Proyecto
 
-El frontend usa el proyecto identificado por `rncdodmxldwcbtcrqdph` y la clave publicable guardada en `config/supabase-config.js`. La clave publicable se puede usar en el navegador; nunca pongas una `service_role` o secret key en estos archivos. La seguridad de datos depende de las politicas RLS del esquema.
+El frontend usa el proyecto identificado por `vghjkfusauakqzkzsqes` y la clave publicable guardada en `config/supabase-config.js`. La clave publicable se puede usar en el navegador; nunca pongas una `service_role` o secret key en estos archivos. La seguridad de datos depende de las politicas RLS del esquema.
 
 ## Crear tablas y politicas
 
