@@ -4,6 +4,9 @@
         let promotions = [];
         let invoices = [];
         let complaints = [];
+        let destinations = null;
+        let currentRoleName = 'client';
+        const STAFF_ROLES = ['admin', 'cajero', 'agente', 'rrhh', 'atencion'];
         let currentUser = { id: '', name: '', firstName: '', lastName: '', document: '', phone: '', email: '', avatar: '' };
         let isClientAuthenticated = false;
         let isAdminAuthenticated = false;
@@ -290,6 +293,35 @@
             }
         }
 
+        function renderPublicDestinations() {
+            if (!Array.isArray(destinations)) return;
+            const published = destinations.filter(item => item.active);
+            Object.keys(DESTINATION_LABELS).forEach(key => { delete DESTINATION_LABELS[key]; delete DESTINATION_KEYWORDS[key]; });
+            published.forEach(item => {
+                DESTINATION_LABELS[item.slug] = item.name;
+                DESTINATION_KEYWORDS[item.slug] = [item.slug, ...item.keywords].map(normalizeText).filter(Boolean);
+            });
+            const select = document.getElementById('search-destination');
+            if (select) {
+                const current = select.value;
+                select.innerHTML = '<option value="">¿A dónde deseas ir?</option>' + published.map(item => `<option value="${escapeHtml(item.slug)}">${escapeHtml(item.name)}</option>`).join('');
+                select.value = DESTINATION_LABELS[current] ? current : '';
+            }
+            const grid = document.getElementById('destination-grid');
+            if (!grid || !published.length) return;
+            grid.innerHTML = published.map(item => `<article class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 bg-slate-800">
+                    ${item.image ? `<img src="${escapeHtml(item.image)}" width="600" height="800" loading="lazy" decoding="async" class="w-full h-72 sm:h-80 object-cover group-hover:scale-110 transition duration-500" alt="${escapeHtml(item.name)}, Perú">` : '<div class="w-full h-72 sm:h-80"></div>'}
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent" aria-hidden="true"></div>
+                    <div class="absolute bottom-0 p-5 sm:p-6 text-white">
+                        ${item.region ? `<span class="bg-brand-600/90 text-white text-xs font-bold px-2.5 py-1 rounded-md">${escapeHtml(item.region)}</span>` : ''}
+                        <h3 class="text-xl sm:text-2xl font-bold mt-2">${escapeHtml(item.name)}</h3>
+                        <p class="text-sm text-slate-200 mt-1 line-clamp-2">${escapeHtml(item.description)}</p>
+                        <button type="button" onclick="filterPackagesByDestination('${escapeHtml(item.slug)}')" class="mt-3 py-2 text-xs font-bold uppercase tracking-wider text-brand-200 hover:text-white group-hover:text-white flex items-center gap-1 transition">Ver Paquetes <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+                    </div>
+                </article>`).join('');
+            grid.className = `grid grid-cols-1 sm:grid-cols-2 ${published.length >= 4 ? 'lg:grid-cols-4' : published.length === 3 ? 'lg:grid-cols-3' : ''} gap-5 sm:gap-6`;
+        }
+
         function filterPackagesByDestination(destination) {
             activeDestinationFilter = DESTINATION_KEYWORDS[destination] ? destination : '';
             const select = document.getElementById('search-destination');
@@ -486,10 +518,10 @@
                         <td class="p-3">${booking.passengers}</td>
                         <td class="p-3 font-bold text-white">S/ ${Number(booking.total).toLocaleString('es-PE')}</td>
                         <td class="p-3"><span class="${statusClasses[booking.status] || statusClasses.PENDIENTE} font-bold px-2 py-0.5 rounded text-[10px]">${escapeHtml(booking.status)}</span></td>
-                        <td class="p-3 text-right whitespace-nowrap">${booking.status === 'PENDIENTE' ? `
+                        <td class="p-3 text-right whitespace-nowrap">${typeof adminBookingActions === 'function' ? adminBookingActions(booking) : (booking.status === 'PENDIENTE' ? `
                             <button onclick="adminConfirmBooking('${escapeHtml(booking.code)}')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1 rounded text-[10px]">Confirmar</button>
                             <button onclick="adminRejectBooking('${escapeHtml(booking.code)}')" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-2.5 py-1 rounded text-[10px]">Cancelar</button>
-                        ` : '<span class="text-slate-500 italic text-[10px]">Sin acciones pendientes</span>'}</td>
+                        ` : '<span class="text-slate-500 italic text-[10px]">Sin acciones pendientes</span>')}</td>
                     </tr>`).join('') : '<tr><td colspan="8" class="p-6 text-center text-slate-400">No se encontraron reservas.</td></tr>';
             }
 
@@ -1259,8 +1291,12 @@
 
         // Cambio de Pestañas en Admin Panel
         function switchAdminTab(tabName) {
-            ['dash', 'reservas', 'ventas', 'clientes', 'paquetes', 'promociones', 'disponibilidad', 'reportes', 'facturacion', 'historial', 'reclamaciones'].forEach(tab => {
-                document.getElementById(`admin-tab-${tab}`)?.classList.toggle('hidden', tab !== tabName);
+            if (typeof canAccessAdminTab === 'function' && !canAccessAdminTab(tabName)) {
+                showToast('No tienes permiso para esta sección.', 'rose');
+                return;
+            }
+            document.querySelectorAll('[id^="admin-tab-"]').forEach(section => {
+                section.classList.toggle('hidden', section.id !== `admin-tab-${tabName}`);
             });
             document.querySelectorAll('[data-admin-tab]').forEach(button => {
                 const active = button.dataset.adminTab === tabName;
@@ -1274,6 +1310,7 @@
             const mobileNav = document.getElementById('admin-mobile-nav');
             if (mobileNav && mobileNav.value !== tabName) mobileNav.value = tabName;
             if (tabName !== 'reservas') renderAdminData();
+            if (typeof renderAdminExtraTab === 'function') renderAdminExtraTab(tabName);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -1282,7 +1319,14 @@
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = `bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-2 transition duration-300 transform translate-y-2 pointer-events-auto`;
-            toast.innerHTML = `<i class="fa-solid fa-circle-info text-${color}-400"></i> ${message}`;
+            const safeColor = ['emerald', 'rose', 'amber', 'sky'].includes(color) ? color : 'emerald';
+            const icon = document.createElement('i');
+            icon.className = `fa-solid fa-circle-info text-${safeColor}-400`;
+            icon.setAttribute('aria-hidden', 'true');
+            const text = document.createElement('span');
+            text.textContent = String(message ?? '');
+            toast.append(icon, text);
+            toast.setAttribute('role', safeColor === 'rose' ? 'alert' : 'status');
             
             container.appendChild(toast);
             setTimeout(() => {
@@ -1363,17 +1407,20 @@
                 window.OrquideasStore.loadPublicCatalog().then(publicData => {
                     packages = publicData.packages;
                     promotions = publicData.promotions;
+                    destinations = publicData.destinations;
+                    renderPublicDestinations();
                     renderPublicPackages();
                 }).catch(error => console.warn('Public catalog could not be loaded:', error));
                 return;
             }
 
             const role = await window.OrquideasStore.currentRole(session.user.id);
-            if (isAdminPage && role !== 'admin') {
+            const isStaff = STAFF_ROLES.includes(role);
+            if (isAdminPage && !isStaff) {
                 window.location.replace('admin_cliente.html');
                 return;
             }
-            if ((isClientPage || isPassagesPage) && role !== 'client') {
+            if ((isClientPage || isPassagesPage) && isStaff) {
                 window.location.replace('admin.html');
                 return;
             }
@@ -1385,12 +1432,16 @@
             promotions = remoteData.promotions;
             invoices = remoteData.invoices;
             complaints = remoteData.complaints || [];
-            isAdminAuthenticated = role === 'admin';
+            destinations = remoteData.destinations;
+            currentRoleName = role;
+            isAdminAuthenticated = isStaff;
             isClientAuthenticated = role === 'client';
             pendingProfileAvatar = currentUser.avatar || '';
             gate?.classList.add('hidden');
             renderAccountControls();
+            renderPublicDestinations();
             renderPublicPackages();
+            if (isAdminPage && typeof initAdminExtras === 'function') await initAdminExtras(role);
             if (isClientPage || isAdminPage) renderBookings();
             if (isPassagesPage) renderPassages();
             if (isInvoicesPage) renderInvoices();
@@ -1426,4 +1477,26 @@
             if (searchDate) searchDate.min = localIsoDate();
             const bookDate = document.getElementById('book-date');
             if (bookDate) bookDate.min = localIsoDate();
+        })();
+
+        // Etiqueta cada celda con el título de su columna (tablas tipo tarjeta en celular)
+        (function enableResponsiveTables() {
+            if (!document.body.classList.contains('responsive-tables')) return;
+            const labelTable = table => {
+                const headers = [...table.querySelectorAll('thead th')].map(th => th.textContent.trim());
+                if (!headers.length) return;
+                table.querySelectorAll('tbody tr').forEach(row => {
+                    [...row.children].forEach((cell, index) => {
+                        if (cell.tagName === 'TD' && !cell.hasAttribute('colspan') && headers[index] !== undefined) cell.setAttribute('data-label', headers[index]);
+                    });
+                });
+            };
+            const labelAll = () => document.querySelectorAll('table').forEach(labelTable);
+            let scheduled = false;
+            new MutationObserver(() => {
+                if (scheduled) return;
+                scheduled = true;
+                requestAnimationFrame(() => { scheduled = false; labelAll(); });
+            }).observe(document.body, { childList: true, subtree: true });
+            labelAll();
         })();

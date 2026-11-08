@@ -138,3 +138,79 @@ body.modal-open [data-modal] {
     background: #fff !important;
   }
 }
+
+/* ===== Tablas como tarjetas en celulares (paneles) ===== */
+@media (max-width: 639px) {
+  .responsive-tables .overflow-x-auto {
+    overflow-x: visible;
+  }
+
+  .responsive-tables table {
+    min-width: 0 !important;
+    width: 100%;
+    font-size: 0.8125rem;
+  }
+
+  .responsive-tables thead {
+    display: none;
+  }
+
+  .responsive-tables tbody,
+  .responsive-tables tr {
+    display: block;
+    width: 100%;
+  }
+
+  .responsive-tables tbody {
+    border: 0 !important;
+  }
+
+  .responsive-tables tr {
+    margin-bottom: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: 0.75rem;
+  }
+
+  .responsive-tables td {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.45rem 0 !important;
+    text-align: right !important;
+    white-space: normal !important;
+    word-break: break-word;
+    border: 0;
+  }
+
+  .responsive-tables td + td {
+    border-top: 1px dashed rgba(148, 163, 184, 0.25);
+  }
+
+  .responsive-tables td[data-label]::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    max-width: 45%;
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    opacity: 0.65;
+  }
+
+  .responsive-tables td[colspan] {
+    display: block;
+    text-align: center !important;
+  }
+
+  .responsive-tables td:not([data-label]),
+  .responsive-tables td[data-label=""] {
+    justify-content: flex-end;
+  }
+
+  .responsive-tables td .flex.justify-end {
+    flex-wrap: wrap;
+  }
+}

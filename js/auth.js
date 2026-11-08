@@ -17,7 +17,8 @@
             return;
         }
         const roles = (data || []).map(record => record.role);
-        const destination = roles.includes('admin') ? 'admin.html' : 'admin_cliente.html';
+        const staffRoles = ['admin', 'cajero', 'agente', 'rrhh', 'atencion'];
+        const destination = roles.some(role => staffRoles.includes(role)) ? 'admin.html' : 'admin_cliente.html';
         window.location.replace(inHtmlFolder ? destination : `html/${destination}`);
     }
 

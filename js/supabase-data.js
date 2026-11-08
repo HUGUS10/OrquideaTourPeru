@@ -122,17 +122,74 @@
 
     async function currentRole(userId) {
         const result = await client.from('user_roles').select('role').eq('user_id', userId);
-        return throwIfError(result).some(record => record.role === 'admin') ? 'admin' : 'client';
+        const roles = throwIfError(result).map(record => record.role);
+        return ['admin', 'cajero', 'agente', 'rrhh', 'atencion'].find(role => roles.includes(role)) || 'client';
+    }
+
+    function mapDestination(row) {
+        const image = row.image_url || (row.image_path ? client.storage.from('package-images').getPublicUrl(row.image_path).data.publicUrl : '');
+        return {
+            id: row.id,
+            slug: row.slug,
+            name: row.name,
+            region: row.region || '',
+            description: row.description || '',
+            keywords: row.keywords || [],
+            image,
+            imagePath: row.image_path,
+            imageUrl: row.image_url,
+            order: row.sort_order,
+            active: row.is_published
+        };
+    }
+
+    async function loadDestinations() {
+        const result = await client.from('destinations').select('*').order('sort_order').order('name');
+        if (result.error) {
+            console.warn('Destinos no disponibles (ejecuta database/equipo_y_finanzas.sql):', result.error.message);
+            return null;
+        }
+        return result.data.map(mapDestination);
+    }
+
+    async function saveDestination(userId, destination, imageDataUrl) {
+        let imagePath = destination.imagePath || null;
+        let imageUrl = destination.imageUrl || null;
+        if (imageDataUrl?.startsWith('data:image/')) {
+            imagePath = (await uploadDataUrl('package-images', userId, imageDataUrl)).path;
+            imageUrl = null;
+        }
+        const values = {
+            slug: destination.slug,
+            name: destination.name,
+            region: destination.region,
+            description: destination.description,
+            keywords: destination.keywords,
+            image_path: imagePath,
+            image_url: imageUrl,
+            sort_order: destination.order,
+            is_published: destination.active,
+            updated_at: new Date().toISOString()
+        };
+        if (destination.id) values.id = destination.id;
+        const result = await client.from('destinations').upsert(values).select('*').single();
+        return mapDestination(throwIfError(result));
+    }
+
+    async function deleteDestination(destinationId) {
+        throwIfError(await client.from('destinations').delete().eq('id', destinationId));
     }
 
     async function loadPublicCatalog() {
-        const [packageResult, promotionResult] = await Promise.all([
+        const [packageResult, promotionResult, destinationList] = await Promise.all([
             client.from('packages').select('*').eq('is_published', true).order('created_at', { ascending: false }),
-            client.from('promotions').select('*').eq('is_active', true).order('created_at', { ascending: false })
+            client.from('promotions').select('*').eq('is_active', true).order('created_at', { ascending: false }),
+            loadDestinations()
         ]);
         return {
             packages: throwIfError(packageResult).map(mapPackage),
-            promotions: throwIfError(promotionResult).map(mapPromotion)
+            promotions: throwIfError(promotionResult).map(mapPromotion),
+            destinations: destinationList
         };
     }
 
@@ -168,7 +225,8 @@
             promotions: rolePromotions.map(mapPromotion),
             bookings: roleBookings.map(mapBooking),
             invoices: roleReceipts.map(mapReceipt),
-            complaints: role === 'admin' ? await loadComplaints() : []
+            complaints: ['admin', 'atencion'].includes(role) ? await loadComplaints() : [],
+            destinations: await loadDestinations()
         };
     }
 
@@ -322,6 +380,10 @@
         createReceipt,
         removeOwnAccount,
         loadComplaints,
+        loadDestinations,
+        saveDestination,
+        deleteDestination,
+        mapDestination,
         updateComplaint,
         submitComplaint
     };

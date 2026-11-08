@@ -48,7 +48,7 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preload" as="image" href="https://images.unsplash.com/photo-1526392060635-9d6019884377?q=75&w=1280&auto=format&fit=crop" fetchpriority="high">
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.5"></script>
     <script src="./config/tailwind-config.js"></script>
     <link rel="stylesheet" href="./css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -195,7 +195,7 @@
                 <p class="text-slate-600 mt-3">Selecciona uno de los maravillosos rincones del Perú y planifica tu próxima gran aventura.</p>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+            <div id="destination-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
                 <article class="group relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1">
                     <img src="https://images.unsplash.com/photo-1526392060635-9d6019884377?q=75&w=600&auto=format&fit=crop" srcset="https://images.unsplash.com/photo-1526392060635-9d6019884377?q=75&w=400&auto=format&fit=crop 400w, https://images.unsplash.com/photo-1526392060635-9d6019884377?q=75&w=600&auto=format&fit=crop 600w, https://images.unsplash.com/photo-1526392060635-9d6019884377?q=75&w=900&auto=format&fit=crop 900w" sizes="(min-width:1024px) 25vw, (min-width:640px) 50vw, 100vw" width="600" height="800" loading="lazy" decoding="async" class="w-full h-72 sm:h-80 object-cover group-hover:scale-110 transition duration-500" alt="Ciudadela inca de Machu Picchu en Cusco, Perú">
                     <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-transparent" aria-hidden="true"></div>
@@ -730,7 +730,7 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" defer></script>
     <script src="./config/supabase-config.js" defer></script>
     <script src="./config/app-config.js" defer></script>
     <script src="./js/supabase-data.js" defer></script>

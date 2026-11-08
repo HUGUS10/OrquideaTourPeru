@@ -6,6 +6,8 @@
         throw new Error('No se pudo cargar el cliente de Supabase.');
     }
 
+    window.OrquideasSupabase = { url: supabaseUrl, publishableKey: supabasePublishableKey };
+
     window.supabaseClient = window.supabase.createClient(supabaseUrl, supabasePublishableKey, {
         auth: {
             autoRefreshToken: true,
