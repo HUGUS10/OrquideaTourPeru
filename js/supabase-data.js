@@ -142,7 +142,10 @@
             active: row.is_published,
             tourUrl: row.tour_url || '',
             tourIs360: Boolean(row.tour_is_360),
-            hasTourColumns: 'tour_url' in row
+            hasTourColumns: 'tour_url' in row,
+            externalTourUrl: row.external_tour_url || '',
+            externalTourLabel: row.external_tour_label || '',
+            hasExternalColumns: 'external_tour_url' in row
         };
     }
 
@@ -178,6 +181,10 @@
             values.tour_url = destination.tourUrl || null;
             values.tour_is_360 = Boolean(destination.tourIs360);
         }
+        if (destination.hasExternalColumns || destination.externalTourUrl) {
+            values.external_tour_url = destination.externalTourUrl || null;
+            values.external_tour_label = destination.externalTourLabel || null;
+        }
         if (destination.id) values.id = destination.id;
         const result = await client.from('destinations').upsert(values).select('*').single();
         return mapDestination(throwIfError(result));
@@ -189,6 +196,50 @@
         const path = `${userId}/${crypto.randomUUID()}.${file.type === 'image/webp' ? 'webp' : 'jpg'}`;
         throwIfError(await client.storage.from('tour-images').upload(path, file, { contentType: file.type, upsert: false }));
         return client.storage.from('tour-images').getPublicUrl(path).data.publicUrl;
+    }
+
+    function mapScene(row) {
+        return {
+            id: row.id,
+            destinationId: row.destination_id,
+            title: row.title,
+            description: row.description || '',
+            image: row.image_url,
+            credit: row.credit || '',
+            creditUrl: row.credit_url || '',
+            yaw: Number(row.initial_yaw) || 0,
+            pitch: Number(row.initial_pitch) || 0,
+            order: row.sort_order
+        };
+    }
+
+    async function loadTourScenes(destinationId) {
+        const result = await client.from('tour_scenes').select('*').eq('destination_id', destinationId).order('sort_order').order('created_at');
+        if (result.error) {
+            console.warn('Escenas 360° no disponibles (ejecuta database/visita_virtual.sql):', result.error.message);
+            return null;
+        }
+        return result.data.map(mapScene);
+    }
+
+    async function saveTourScene(scene) {
+        const values = {
+            destination_id: scene.destinationId,
+            title: scene.title,
+            description: scene.description || '',
+            image_url: scene.image,
+            credit: scene.credit || null,
+            credit_url: scene.creditUrl || null,
+            initial_yaw: Number(scene.yaw) || 0,
+            initial_pitch: Number(scene.pitch) || 0,
+            sort_order: Number(scene.order) || 0
+        };
+        if (scene.id) values.id = scene.id;
+        return mapScene(throwIfError(await client.from('tour_scenes').upsert(values).select('*').single()));
+    }
+
+    async function deleteTourScene(sceneId) {
+        throwIfError(await client.from('tour_scenes').delete().eq('id', sceneId));
     }
 
     async function deleteDestination(destinationId) {
@@ -399,6 +450,9 @@
         saveDestination,
         deleteDestination,
         uploadTourImage,
+        loadTourScenes,
+        saveTourScene,
+        deleteTourScene,
         mapDestination,
         updateComplaint,
         submitComplaint

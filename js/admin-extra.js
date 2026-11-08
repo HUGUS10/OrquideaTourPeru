@@ -628,6 +628,8 @@ function renderDestinationsTab() {
                     <legend class="px-2 text-xs font-bold text-emerald-300"><i class="fa-solid fa-street-view mr-1" aria-hidden="true"></i>Visita virtual (opcional)</legend>
                     <label class="text-xs text-slate-300">Foto 360° (URL https) — si la dejas vacía se usa la foto principal como panorámica<input name="tourUrl" type="url" maxlength="500" placeholder="https://..." class="${INPUT}"></label>
                     <label class="inline-flex items-center justify-center gap-2 cursor-pointer ${BTN_SECONDARY}"><i class="fa-solid fa-upload" aria-hidden="true"></i><span id="tour-upload-label">Subir foto 360° (JPG, máx. 15 MB)</span><input type="file" accept="image/jpeg,image/webp" class="sr-only" onchange="uploadDestinationTour(this)"></label>
+                    <label class="text-xs text-slate-300">Enlace a tour 360° externo (opcional, se abre en otra pestaña)<input name="externalTourUrl" type="url" maxlength="500" placeholder="https://..." class="${INPUT}"></label>
+                    <label class="text-xs text-slate-300">Texto del botón externo<input name="externalTourLabel" maxlength="60" placeholder="Tour 360° oficial" class="${INPUT}"></label>
                     <label class="flex items-center gap-2 text-xs text-slate-300 lg:col-span-2"><input name="tourIs360" type="checkbox" class="rounded border-slate-600 text-brand-600 focus:ring-brand-500"> Es una foto 360° completa (proporción 2:1, tomada con cámara 360° o el modo esfera del celular)</label>
                 </fieldset>
                 <label class="flex items-center gap-2 text-xs text-slate-300"><input name="active" type="checkbox" checked class="rounded border-slate-600 text-brand-600 focus:ring-brand-500"> Publicar destino</label>
@@ -637,6 +639,7 @@ function renderDestinationsTab() {
                 </div>
             </form>
         </section>
+        <section id="scene-manager" class="${CARD} hidden"></section>
         <section class="${CARD}">
             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                 ${destinations.length ? destinations.map(item => `<article class="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden flex flex-col">
@@ -646,7 +649,7 @@ function renderDestinationsTab() {
                         <p class="text-slate-400">${escapeHtml(item.region)} · orden ${Number(item.order)} · ${packagesForDestination(item)} paquete(s)</p>
                         <p class="text-slate-300 line-clamp-2">${escapeHtml(item.description)}</p>
                         ${item.tourUrl ? `<p class="text-emerald-300"><i class="fa-solid fa-street-view mr-1" aria-hidden="true"></i>${item.tourIs360 ? 'Tiene foto 360°' : 'Tiene panorámica propia'}</p>` : ''}
-                        <div class="mt-auto flex flex-wrap gap-3 pt-2"><button type="button" onclick="openVirtualTour('${escapeHtml(item.slug)}')" class="text-emerald-300 font-bold">Probar visita</button><button type="button" onclick="editDestination('${escapeHtml(item.id)}')" class="text-sky-300 font-bold">Editar</button><button type="button" onclick="toggleDestination('${escapeHtml(item.id)}')" class="text-amber-300 font-bold">${item.active ? 'Ocultar' : 'Publicar'}</button><button type="button" onclick="removeDestination('${escapeHtml(item.id)}')" class="text-rose-300 font-bold ml-auto">Eliminar</button></div>
+                        <div class="mt-auto flex flex-wrap gap-3 pt-2"><button type="button" onclick="openVirtualTour('${escapeHtml(item.slug)}')" class="text-emerald-300 font-bold">Probar visita</button><button type="button" onclick="openSceneManager('${escapeHtml(item.id)}')" class="text-orange-300 font-bold">Escenas 360°</button><button type="button" onclick="editDestination('${escapeHtml(item.id)}')" class="text-sky-300 font-bold">Editar</button><button type="button" onclick="toggleDestination('${escapeHtml(item.id)}')" class="text-amber-300 font-bold">${item.active ? 'Ocultar' : 'Publicar'}</button><button type="button" onclick="removeDestination('${escapeHtml(item.id)}')" class="text-rose-300 font-bold ml-auto">Eliminar</button></div>
                     </div>
                 </article>`).join('') : '<p class="text-sm text-slate-400">Aún no hay destinos.</p>'}
             </div>
@@ -707,6 +710,8 @@ function editDestination(destinationId) {
     form.elements.imageUrl.value = item.imageUrl || '';
     form.elements.tourUrl.value = item.tourUrl || '';
     form.elements.tourIs360.checked = Boolean(item.tourIs360);
+    form.elements.externalTourUrl.value = item.externalTourUrl || '';
+    form.elements.externalTourLabel.value = item.externalTourLabel || '';
     form.elements.active.checked = item.active;
     extraState.pendingDestinationImage = '';
     setDestinationPreview(item.image);
@@ -718,6 +723,11 @@ async function saveDestinationForm(form) {
     const existing = destinations.find(row => row.id === id);
     const pastedUrl = form.elements.imageUrl.value.trim();
     const tourUrl = form.elements.tourUrl.value.trim();
+    const externalTourUrl = form.elements.externalTourUrl.value.trim();
+    if (externalTourUrl && !/^https:\/\//i.test(externalTourUrl)) {
+        showToast('El enlace del tour externo debe empezar con https://', 'rose');
+        return;
+    }
     if (tourUrl && !/^https:\/\//i.test(tourUrl)) {
         showToast('La URL de la foto 360° debe empezar con https://', 'rose');
         return;
@@ -738,6 +748,9 @@ async function saveDestinationForm(form) {
         tourUrl,
         tourIs360: form.elements.tourIs360.checked && Boolean(tourUrl),
         hasTourColumns: Boolean(existing?.hasTourColumns),
+        externalTourUrl,
+        externalTourLabel: form.elements.externalTourLabel.value.trim(),
+        hasExternalColumns: Boolean(existing?.hasExternalColumns),
         imagePath: extraState.pendingDestinationImage || pastedUrl ? null : existing?.imagePath || null,
         imageUrl: pastedUrl || (extraState.pendingDestinationImage ? null : existing?.imageUrl || null)
     };
@@ -776,6 +789,124 @@ async function uploadDestinationTour(input) {
     } finally {
         label.textContent = 'Subir foto 360° (JPG, máx. 15 MB)';
         input.value = '';
+    }
+}
+
+// ---------- escenas 360° de un destino ----------
+const sceneState = { destinationId: '', scenes: [] };
+
+async function openSceneManager(destinationId) {
+    const box = document.getElementById('scene-manager');
+    const destination = destinations.find(item => item.id === destinationId);
+    if (!box || !destination) return;
+    sceneState.destinationId = destinationId;
+    box.classList.remove('hidden');
+    box.innerHTML = '<p class="text-sm text-slate-400">Cargando escenas…</p>';
+    box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const scenes = await window.OrquideasStore.loadTourScenes(destinationId);
+    if (scenes === null) {
+        box.innerHTML = '<p class="text-sm text-amber-200">Ejecuta <b>database/visita_virtual.sql</b> en Supabase para crear tours por escenas.</p>';
+        return;
+    }
+    sceneState.scenes = scenes;
+    renderSceneManager();
+}
+
+function renderSceneManager() {
+    const box = document.getElementById('scene-manager');
+    const destination = destinations.find(item => item.id === sceneState.destinationId);
+    if (!box || !destination) return;
+    const scenes = sceneState.scenes;
+    box.innerHTML = `
+        <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
+            <div><h3 class="font-extrabold text-lg text-white">Escenas 360° · ${escapeHtml(destination.name)}</h3><p class="text-xs text-slate-400 mt-1">Cada escena es una foto 360° (proporción 2:1). Los visitantes pasan de una a otra como en un recorrido.</p></div>
+            <div class="flex gap-2"><button type="button" onclick="openVirtualTour('${escapeHtml(destination.slug)}')" class="${BTN_SECONDARY}"><i class="fa-solid fa-eye mr-1" aria-hidden="true"></i>Ver tour</button><button type="button" onclick="document.getElementById('scene-manager').classList.add('hidden')" class="${BTN_SECONDARY}">Cerrar</button></div>
+        </div>
+        <form id="scene-form" onsubmit="event.preventDefault(); saveSceneForm(this);" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-5">
+            <input type="hidden" name="id">
+            <label class="text-xs text-slate-300">Nombre de la escena<input name="title" required minlength="2" maxlength="80" placeholder="Casa del Inca" class="${INPUT}"></label>
+            <label class="text-xs text-slate-300">Orden<input name="order" type="number" value="${scenes.length + 1}" class="${INPUT}"></label>
+            <label class="text-xs text-slate-300 sm:col-span-2">Descripción corta<input name="description" maxlength="300" class="${INPUT}"></label>
+            <label class="text-xs text-slate-300 sm:col-span-2">Foto 360° (URL https)<input name="image" type="url" required maxlength="600" class="${INPUT}"></label>
+            <label class="inline-flex items-center justify-center gap-2 cursor-pointer ${BTN_SECONDARY} self-end"><i class="fa-solid fa-upload" aria-hidden="true"></i><span id="scene-upload-label">Subir foto 360°</span><input type="file" accept="image/jpeg,image/webp" class="sr-only" onchange="uploadSceneImage(this)"></label>
+            <label class="text-xs text-slate-300">Crédito / autor (opcional)<input name="credit" maxlength="160" class="${INPUT}"></label>
+            <label class="text-xs text-slate-300 sm:col-span-2">Enlace del crédito (opcional)<input name="creditUrl" type="url" maxlength="500" class="${INPUT}"></label>
+            <label class="text-xs text-slate-300">Ángulo inicial (−180 a 180°)<input name="yaw" type="number" min="-180" max="180" value="0" class="${INPUT}"></label>
+            <div class="flex items-end gap-2"><button type="button" onclick="document.getElementById('scene-form').reset(); document.getElementById('scene-form').elements.id.value='';" class="${BTN_SECONDARY}">Limpiar</button><button type="submit" class="${BTN_PRIMARY} flex-1"><i class="fa-solid fa-floppy-disk mr-2" aria-hidden="true"></i>Guardar escena</button></div>
+        </form>
+        ${scenes.length ? `<ol class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">${scenes.map(scene => `<li class="flex gap-3 bg-slate-900 border border-slate-700 rounded-xl p-2.5">
+            <img src="${escapeHtml(scene.image.replace(/\/\d+px-/, '/1280px-'))}" alt="" loading="lazy" class="w-28 h-16 object-cover rounded-lg bg-slate-800 shrink-0">
+            <div class="min-w-0 flex-1 text-xs">
+                <p class="font-bold text-white truncate">${Number(scene.order)}. ${escapeHtml(scene.title)}</p>
+                <p class="text-slate-400 truncate">${escapeHtml(scene.credit || 'Foto propia')}</p>
+                <div class="flex gap-3 mt-1.5"><button type="button" onclick="editScene('${escapeHtml(scene.id)}')" class="text-sky-300 font-bold">Editar</button><button type="button" onclick="removeScene('${escapeHtml(scene.id)}')" class="text-rose-300 font-bold">Eliminar</button></div>
+            </div>
+        </li>`).join('')}</ol>` : '<p class="text-sm text-slate-400">Este destino aún no tiene escenas. Mientras tanto se muestra la vista panorámica.</p>'}`;
+}
+
+async function uploadSceneImage(input) {
+    const file = input.files?.[0];
+    const form = document.getElementById('scene-form');
+    const label = document.getElementById('scene-upload-label');
+    if (!file || !form) return;
+    label.textContent = 'Subiendo…';
+    try {
+        form.elements.image.value = await window.OrquideasStore.uploadTourImage(currentUser.id, file);
+        showToast('Foto subida. Completa el nombre y guarda la escena.');
+    } catch (error) {
+        showToast(friendlyError(error, 'No se pudo subir la foto 360°.'), 'rose');
+    } finally {
+        label.textContent = 'Subir foto 360°';
+        input.value = '';
+    }
+}
+
+function editScene(sceneId) {
+    const scene = sceneState.scenes.find(item => item.id === sceneId);
+    const form = document.getElementById('scene-form');
+    if (!scene || !form) return;
+    Object.entries({ id: scene.id, title: scene.title, order: scene.order, description: scene.description, image: scene.image, credit: scene.credit, creditUrl: scene.creditUrl, yaw: scene.yaw })
+        .forEach(([name, value]) => { form.elements[name].value = value ?? ''; });
+    form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+async function saveSceneForm(form) {
+    const image = form.elements.image.value.trim();
+    const creditUrl = form.elements.creditUrl.value.trim();
+    if (!/^https:\/\//i.test(image) || (creditUrl && !/^https:\/\//i.test(creditUrl))) {
+        showToast('Los enlaces deben empezar con https://', 'rose');
+        return;
+    }
+    try {
+        const saved = await window.OrquideasStore.saveTourScene({
+            id: form.elements.id.value || undefined,
+            destinationId: sceneState.destinationId,
+            title: form.elements.title.value.trim(),
+            description: form.elements.description.value.trim(),
+            image,
+            credit: form.elements.credit.value.trim(),
+            creditUrl,
+            yaw: Number(form.elements.yaw.value) || 0,
+            order: Number(form.elements.order.value) || 0
+        });
+        const exists = sceneState.scenes.some(item => item.id === saved.id);
+        sceneState.scenes = (exists ? sceneState.scenes.map(item => item.id === saved.id ? saved : item) : [...sceneState.scenes, saved]).sort((a, b) => a.order - b.order);
+        renderSceneManager();
+        showToast('Escena guardada.');
+    } catch (error) {
+        showToast(friendlyError(error, 'No se pudo guardar la escena.'), 'rose');
+    }
+}
+
+async function removeScene(sceneId) {
+    if (!confirm('¿Eliminar esta escena del tour?')) return;
+    try {
+        await window.OrquideasStore.deleteTourScene(sceneId);
+        sceneState.scenes = sceneState.scenes.filter(item => item.id !== sceneId);
+        renderSceneManager();
+        showToast('Escena eliminada.');
+    } catch (error) {
+        showToast(friendlyError(error, 'No se pudo eliminar la escena.'), 'rose');
     }
 }
 
