@@ -3,6 +3,7 @@
         let packages = [];
         let promotions = [];
         let invoices = [];
+        let complaints = [];
         let currentUser = { id: '', name: '', firstName: '', lastName: '', document: '', phone: '', email: '', avatar: '' };
         let isClientAuthenticated = false;
         let isAdminAuthenticated = false;
@@ -993,6 +994,170 @@
             renderInvoices();
             renderPackages();
             renderPromotions();
+            renderAvailability();
+            renderHistory();
+            renderComplaints();
+            renderAdminAlerts();
+            const today = document.getElementById('admin-today');
+            if (today) today.textContent = new Date().toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        // Disponibilidad real por paquete (cupos libres + pasajeros reservados)
+        function renderAvailability() {
+            const list = document.getElementById('admin-availability-list');
+            if (!list) return;
+            if (!packages.length) {
+                list.innerHTML = '<p class="text-sm text-slate-400">No hay paquetes registrados.</p>';
+                return;
+            }
+            list.innerHTML = packages.map(packageItem => {
+                const reserved = bookings
+                    .filter(booking => booking.packageId === packageItem.id && ['PENDIENTE', 'CONFIRMADA'].includes(booking.status))
+                    .reduce((total, booking) => total + Number(booking.passengers), 0);
+                const free = Number(packageItem.stock);
+                const capacity = reserved + free;
+                const percent = capacity ? Math.round((reserved / capacity) * 100) : 0;
+                const tone = free === 0 ? 'rose' : free <= 5 ? 'amber' : 'emerald';
+                const note = free === 0 ? ' (agotado)' : free <= 5 ? ' (crítico)' : '';
+                return `<div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                    <div class="flex flex-wrap justify-between items-center gap-2 text-xs mb-2"><span class="font-bold text-white">${escapeHtml(packageItem.name)}${packageItem.active ? '' : ' <span class="text-slate-500">(oculto)</span>'}</span><span class="text-${tone}-400 font-mono font-bold">${reserved} / ${capacity} cupos ocupados (${percent}%)</span></div>
+                    <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden"><div class="bg-${tone}-500 h-full rounded-full" style="width:${percent}%"></div></div>
+                    <div class="flex justify-between gap-2 text-[11px] text-slate-500 mt-2"><span>Reservados (pendientes + confirmados): ${reserved}</span><span class="text-${tone}-400 font-bold">${free} cupos libres${note}</span></div>
+                </div>`;
+            }).join('');
+        }
+
+        // Historial construido con movimientos reales
+        function renderHistory() {
+            const body = document.getElementById('admin-history-body');
+            if (!body) return;
+            const events = [
+                ...bookings.map(booking => ({ date: booking.createdAt || booking.date, who: booking.customer || booking.email, action: `Reserva ${booking.status.toLowerCase()}`, module: 'Reservas', ref: booking.code })),
+                ...invoices.map(invoice => ({ date: invoice.date, who: 'Administrador', action: `Emitió ${invoice.type.toLowerCase()}`, module: 'Comprobantes', ref: invoice.id })),
+                ...complaints.map(item => ({ date: item.createdAt, who: item.name, action: `Registró ${item.kind} (${item.status.replace('_', ' ')})`, module: 'Reclamaciones', ref: item.code }))
+            ].filter(event => event.date).sort((left, right) => String(right.date).localeCompare(String(left.date))).slice(0, 50);
+            body.innerHTML = events.length
+                ? events.map(event => `<tr><td class="p-3 text-white">${escapeHtml(event.who)}</td><td class="p-3">${escapeHtml(event.action)}</td><td class="p-3">${escapeHtml(event.module)}</td><td class="p-3 font-mono text-brand-400">${escapeHtml(event.ref)}</td><td class="p-3 text-slate-400">${escapeHtml(new Date(event.date).toLocaleString('es-PE'))}</td></tr>`).join('')
+                : '<tr><td colspan="5" class="p-6 text-center text-slate-400">Aún no hay movimientos.</td></tr>';
+        }
+
+        // Alertas del dashboard: lo que el dueño debe atender
+        function renderAdminAlerts() {
+            const container = document.getElementById('admin-alerts');
+            const pendingBookings = bookings.filter(booking => booking.status === 'PENDIENTE').length;
+            const pendingComplaints = complaints.filter(item => item.status !== 'respondido').length;
+            const soldOut = packages.filter(packageItem => packageItem.active && Number(packageItem.stock) === 0).length;
+            const badge = document.getElementById('admin-complaints-badge');
+            if (badge) {
+                badge.textContent = pendingComplaints;
+                badge.classList.toggle('hidden', !pendingComplaints);
+            }
+            if (!container) return;
+            const alerts = [];
+            if (pendingBookings) alerts.push(['amber', 'fa-hourglass-half', `Tienes ${pendingBookings} reserva(s) pendiente(s) de confirmar.`, 'reservas', 'Revisar reservas']);
+            if (pendingComplaints) alerts.push(['rose', 'fa-book', `Hay ${pendingComplaints} reclamo(s) sin responder. Plazo legal: 15 días hábiles.`, 'reclamaciones', 'Responder']);
+            if (soldOut) alerts.push(['sky', 'fa-ban', `${soldOut} paquete(s) publicado(s) sin cupos disponibles.`, 'paquetes', 'Ver paquetes']);
+            container.innerHTML = alerts.map(([tone, icon, text, tab, label]) => `<div class="flex flex-wrap items-center gap-3 rounded-xl border border-${tone}-500/40 bg-${tone}-500/10 px-4 py-3 text-sm text-${tone}-200"><i class="fa-solid ${icon}" aria-hidden="true"></i><span class="flex-1 min-w-[200px]">${text}</span><button type="button" onclick="switchAdminTab('${tab}')" class="font-bold underline underline-offset-2">${label}</button></div>`).join('');
+        }
+
+        // Libro de reclamaciones (admin)
+        const COMPLAINT_STATUS = {
+            pendiente: ['Pendiente', 'bg-rose-500/20 text-rose-300'],
+            en_proceso: ['En proceso', 'bg-amber-500/20 text-amber-300'],
+            respondido: ['Respondido', 'bg-emerald-500/20 text-emerald-300']
+        };
+
+        function businessDaysSince(dateValue) {
+            const day = new Date(dateValue);
+            const end = new Date();
+            let days = 0;
+            day.setDate(day.getDate() + 1);
+            while (day <= end) {
+                if (![0, 6].includes(day.getDay())) days += 1;
+                day.setDate(day.getDate() + 1);
+            }
+            return days;
+        }
+
+        function renderComplaints() {
+            const list = document.getElementById('admin-complaints-list');
+            if (!list) return;
+            const filter = document.getElementById('admin-complaint-filter')?.value || '';
+            const rows = complaints.filter(item => !filter || item.status === filter);
+            if (!rows.length) {
+                list.innerHTML = '<p class="py-8 text-center text-sm text-slate-400">No hay reclamos registrados.</p>';
+                return;
+            }
+            list.innerHTML = rows.map(item => {
+                const [statusLabel, statusClass] = COMPLAINT_STATUS[item.status] || COMPLAINT_STATUS.pendiente;
+                const elapsed = businessDaysSince(item.createdAt);
+                const late = item.status !== 'respondido' && elapsed > 15;
+                const id = escapeHtml(item.id);
+                const mailSubject = encodeURIComponent(`Respuesta a su ${item.kind} ${item.code}`);
+                return `<details class="bg-slate-900 border ${late ? 'border-rose-600' : 'border-slate-700'} rounded-xl">
+                    <summary class="cursor-pointer list-none p-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
+                        <span class="font-mono font-bold text-brand-400">${escapeHtml(item.code)}</span>
+                        <span class="uppercase font-bold ${item.kind === 'reclamo' ? 'text-amber-300' : 'text-sky-300'}">${escapeHtml(item.kind)}</span>
+                        <span class="text-white font-semibold flex-1 min-w-[140px]">${escapeHtml(item.name)}</span>
+                        <span class="text-slate-400">${escapeHtml(new Date(item.createdAt).toLocaleDateString('es-PE'))} · ${elapsed} día(s) hábil(es)${late ? ' <b class="text-rose-400">VENCIDO</b>' : ''}</span>
+                        <span class="px-2 py-0.5 rounded font-bold text-[10px] ${statusClass}">${statusLabel}</span>
+                    </summary>
+                    <div class="border-t border-slate-800 p-4 grid gap-4 text-xs text-slate-300 lg:grid-cols-2">
+                        <dl class="grid grid-cols-[auto,1fr] gap-x-3 gap-y-1.5">
+                            <dt class="text-slate-500">Documento</dt><dd>${escapeHtml(item.documentType)} ${escapeHtml(item.documentNumber)}</dd>
+                            <dt class="text-slate-500">Correo</dt><dd class="break-all"><a class="underline" href="mailto:${escapeHtml(item.email)}?subject=${mailSubject}">${escapeHtml(item.email)}</a></dd>
+                            <dt class="text-slate-500">Teléfono</dt><dd>${escapeHtml(item.phone || '—')}</dd>
+                            <dt class="text-slate-500">Domicilio</dt><dd>${escapeHtml(item.address)}</dd>
+                            ${item.isMinor ? `<dt class="text-slate-500">Apoderado</dt><dd>${escapeHtml(item.guardian)}</dd>` : ''}
+                            <dt class="text-slate-500">${item.goodType === 'producto' ? 'Producto' : 'Servicio'}</dt><dd>${escapeHtml(item.goodDescription)}</dd>
+                            <dt class="text-slate-500">Monto</dt><dd>${item.amount === null ? '—' : 'S/ ' + item.amount.toLocaleString('es-PE')}</dd>
+                        </dl>
+                        <div class="space-y-3">
+                            <div><p class="text-slate-500 mb-1">Detalle</p><p class="whitespace-pre-line text-white">${escapeHtml(item.detail)}</p></div>
+                            <div><p class="text-slate-500 mb-1">Pedido del consumidor</p><p class="whitespace-pre-line text-white">${escapeHtml(item.request)}</p></div>
+                        </div>
+                        <form class="lg:col-span-2 space-y-2" onsubmit="event.preventDefault(); respondComplaint('${id}', this)">
+                            <label class="block text-slate-400 font-bold" for="response-${id}">Respuesta del proveedor</label>
+                            <textarea id="response-${id}" name="response" rows="3" maxlength="3000" required class="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-brand-500">${escapeHtml(item.response)}</textarea>
+                            <div class="flex flex-wrap gap-2 justify-end">
+                                ${item.status === 'pendiente' ? `<button type="button" onclick="setComplaintStatus('${id}', 'en_proceso')" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-3 py-2 rounded-lg">Marcar en proceso</button>` : ''}
+                                <button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white font-bold px-3 py-2 rounded-lg">${item.response ? 'Actualizar respuesta' : 'Guardar respuesta'}</button>
+                            </div>
+                            ${item.respondedAt ? `<p class="text-right text-slate-500">Respondido el ${escapeHtml(new Date(item.respondedAt).toLocaleString('es-PE'))}. Envía también la respuesta al correo del consumidor.</p>` : ''}
+                        </form>
+                    </div>
+                </details>`;
+            }).join('');
+        }
+
+        async function setComplaintStatus(complaintId, status) {
+            try {
+                const updated = await window.OrquideasStore.updateComplaint(complaintId, { status });
+                complaints = complaints.map(item => item.id === complaintId ? updated : item);
+                renderComplaints();
+                renderAdminAlerts();
+                showToast('Estado del reclamo actualizado.');
+            } catch (error) {
+                showToast(error.message || 'No se pudo actualizar el reclamo.', 'rose');
+            }
+        }
+
+        async function respondComplaint(complaintId, form) {
+            const response = form.elements.response.value.trim();
+            if (response.length < 5) {
+                showToast('Escribe una respuesta más completa.', 'rose');
+                return;
+            }
+            try {
+                const updated = await window.OrquideasStore.updateComplaint(complaintId, { response });
+                complaints = complaints.map(item => item.id === complaintId ? updated : item);
+                renderComplaints();
+                renderAdminAlerts();
+                renderHistory();
+                showToast('Respuesta guardada. Recuerda enviarla al correo del consumidor.');
+            } catch (error) {
+                showToast(error.message || 'No se pudo guardar la respuesta.', 'rose');
+            }
         }
 
         function renderAdminDashboard() {
@@ -1094,12 +1259,22 @@
 
         // Cambio de Pestañas en Admin Panel
         function switchAdminTab(tabName) {
-            ['dash', 'reservas', 'ventas', 'clientes', 'paquetes', 'promociones', 'disponibilidad', 'reportes', 'facturacion', 'historial'].forEach(tab => {
-                document.getElementById(`admin-tab-${tab}`).classList.toggle('hidden', tab !== tabName);
+            ['dash', 'reservas', 'ventas', 'clientes', 'paquetes', 'promociones', 'disponibilidad', 'reportes', 'facturacion', 'historial', 'reclamaciones'].forEach(tab => {
+                document.getElementById(`admin-tab-${tab}`)?.classList.toggle('hidden', tab !== tabName);
+            });
+            document.querySelectorAll('[data-admin-tab]').forEach(button => {
+                const active = button.dataset.adminTab === tabName;
+                button.classList.toggle('bg-brand-600', active);
+                button.classList.toggle('text-white', active);
+                button.classList.toggle('font-semibold', active);
+                button.classList.toggle('text-slate-400', !active);
+                if (active) button.setAttribute('aria-current', 'page');
+                else button.removeAttribute('aria-current');
             });
             const mobileNav = document.getElementById('admin-mobile-nav');
-            if (mobileNav.value !== tabName) mobileNav.value = tabName;
-            if (tabName === 'clientes' || tabName === 'reportes' || tabName === 'dash' || tabName === 'ventas' || tabName === 'paquetes' || tabName === 'promociones' || tabName === 'facturacion') renderAdminData();
+            if (mobileNav && mobileNav.value !== tabName) mobileNav.value = tabName;
+            if (tabName !== 'reservas') renderAdminData();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // Notificaciones Toast
@@ -1209,6 +1384,7 @@
             packages = remoteData.packages;
             promotions = remoteData.promotions;
             invoices = remoteData.invoices;
+            complaints = remoteData.complaints || [];
             isAdminAuthenticated = role === 'admin';
             isClientAuthenticated = role === 'client';
             pendingProfileAvatar = currentUser.avatar || '';

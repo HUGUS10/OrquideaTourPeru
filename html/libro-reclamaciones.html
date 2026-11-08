@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Libro de Reclamaciones | Orquídea Tour Perú</title>
+    <meta name="description" content="Libro de Reclamaciones virtual de Orquídea Tour Perú. Registra tu reclamo o queja y recibe respuesta en un plazo máximo de 15 días hábiles.">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#16a34a">
+    <link rel="canonical" href="https://orquideatourperu.vercel.app/html/libro-reclamaciones.html">
+    <link rel="icon" type="image/jpeg" href="../img/logo.png">
+    <link rel="apple-touch-icon" href="../img/logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../config/tailwind-config.js"></script>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800 flex flex-col">
+    <a href="#contenido" class="skip-link">Saltar al contenido</a>
+    <header class="w-full border-b border-slate-200 bg-white">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+            <a href="../index.html" class="flex items-center gap-3"><img src="../img/logo.png" alt="Logo de Orquídea Tour Perú" width="44" height="44" class="w-11 h-11 object-contain"><span class="font-extrabold text-slate-900">ORQUÍDEA <small class="block text-xs font-semibold text-brand-700">TOUR PERÚ</small></span></a>
+            <a href="../index.html" class="text-sm font-semibold text-slate-600 hover:text-brand-700 py-2">Volver al inicio</a>
+        </div>
+    </header>
+
+    <main id="contenido" class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 sm:py-10">
+        <section class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-8">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4 border-b border-slate-200 pb-5 mb-6">
+                <div class="w-14 h-14 rounded-xl bg-brand-50 text-brand-700 grid place-items-center text-2xl shrink-0" aria-hidden="true">📖</div>
+                <div class="flex-1">
+                    <h1 class="text-2xl sm:text-3xl font-black text-slate-900">Libro de Reclamaciones</h1>
+                    <p id="business-info" class="text-sm text-slate-600 mt-1">Orquídea Tour Perú · P. 23 de Septiembre, Calle 8, Mz. D, Lt. 8, Santa Anita, Lima</p>
+                </div>
+                <p class="text-sm text-slate-500 sm:text-right">Fecha: <strong id="today" class="text-slate-800"></strong></p>
+            </div>
+
+            <form id="complaint-form" class="space-y-8" novalidate>
+                <fieldset class="space-y-4">
+                    <legend class="text-lg font-bold text-slate-900 mb-1">1. Identificación del consumidor</legend>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <label class="sm:col-span-2 text-sm font-semibold text-slate-700">Nombre completo *
+                            <input name="consumer_name" required minlength="3" maxlength="150" autocomplete="name" class="field">
+                        </label>
+                        <label class="text-sm font-semibold text-slate-700">Tipo de documento *
+                            <select name="document_type" required class="field">
+                                <option value="DNI">DNI</option>
+                                <option value="CE">Carné de extranjería</option>
+                                <option value="Pasaporte">Pasaporte</option>
+                                <option value="RUC">RUC</option>
+                            </select>
+                        </label>
+                        <label class="text-sm font-semibold text-slate-700">N.° de documento *
+                            <input name="document_number" required minlength="6" maxlength="20" inputmode="numeric" autocomplete="off" class="field">
+                        </label>
+                        <label class="sm:col-span-2 text-sm font-semibold text-slate-700">Domicilio *
+                            <input name="address" required minlength="5" maxlength="250" autocomplete="street-address" class="field">
+                        </label>
+                        <label class="text-sm font-semibold text-slate-700">Teléfono
+                            <input name="phone" type="tel" maxlength="20" autocomplete="tel" class="field">
+                        </label>
+                        <label class="text-sm font-semibold text-slate-700">Correo electrónico *
+                            <input name="email" type="email" required maxlength="150" autocomplete="email" class="field">
+                        </label>
+                        <label class="sm:col-span-2 flex items-center gap-2 text-sm text-slate-700">
+                            <input name="is_minor" type="checkbox" class="rounded border-slate-300 text-brand-600 focus:ring-brand-500"> Soy menor de edad
+                        </label>
+                        <label id="guardian-field" class="hidden sm:col-span-2 text-sm font-semibold text-slate-700">Nombre del padre, madre o apoderado *
+                            <input name="guardian_name" maxlength="150" class="field">
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="space-y-4">
+                    <legend class="text-lg font-bold text-slate-900 mb-1">2. Identificación del bien contratado</legend>
+                    <div class="flex flex-wrap gap-4 text-sm">
+                        <label class="flex items-center gap-2"><input type="radio" name="good_type" value="servicio" checked class="text-brand-600 focus:ring-brand-500"> Servicio</label>
+                        <label class="flex items-center gap-2"><input type="radio" name="good_type" value="producto" class="text-brand-600 focus:ring-brand-500"> Producto</label>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <label class="sm:col-span-2 text-sm font-semibold text-slate-700">Descripción (paquete, código de reserva, fecha) *
+                            <input name="good_description" required minlength="3" maxlength="500" placeholder="Ej.: Experiencia Machu Picchu, reserva RES-XXXX" class="field">
+                        </label>
+                        <label class="text-sm font-semibold text-slate-700">Monto reclamado (S/)
+                            <input name="claimed_amount" type="number" min="0" step="0.01" inputmode="decimal" class="field">
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="space-y-4">
+                    <legend class="text-lg font-bold text-slate-900 mb-1">3. Detalle de la reclamación</legend>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                        <label class="flex gap-3 items-start border border-slate-200 rounded-xl p-3 cursor-pointer has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50">
+                            <input type="radio" name="kind" value="reclamo" checked class="mt-1 text-brand-600 focus:ring-brand-500">
+                            <span><strong>Reclamo:</strong> disconformidad relacionada con el servicio contratado.</span>
+                        </label>
+                        <label class="flex gap-3 items-start border border-slate-200 rounded-xl p-3 cursor-pointer has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50">
+                            <input type="radio" name="kind" value="queja" class="mt-1 text-brand-600 focus:ring-brand-500">
+                            <span><strong>Queja:</strong> malestar por la atención recibida, no relacionado con el servicio.</span>
+                        </label>
+                    </div>
+                    <label class="block text-sm font-semibold text-slate-700">Detalle *
+                        <textarea name="detail" required minlength="10" maxlength="3000" rows="5" class="field"></textarea>
+                    </label>
+                    <label class="block text-sm font-semibold text-slate-700">Pedido (qué solución esperas) *
+                        <textarea name="request" required minlength="5" maxlength="1500" rows="3" class="field"></textarea>
+                    </label>
+                </fieldset>
+
+                <div class="rounded-xl bg-slate-50 border border-slate-200 p-4 text-xs text-slate-600 space-y-1">
+                    <p>• La formulación del reclamo no impide acudir a otras vías de solución de controversias ni es requisito previo para interponer una denuncia ante el INDECOPI.</p>
+                    <p>• El proveedor deberá dar respuesta al reclamo en un plazo no mayor a quince (15) días hábiles.</p>
+                    <p>• Recibirás una copia con tu código de registro al enviar este formulario.</p>
+                </div>
+
+                <label class="flex items-start gap-2 text-sm text-slate-700">
+                    <input name="accept" type="checkbox" required class="mt-0.5 rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+                    <span>Declaro que los datos consignados son verdaderos y acepto la <a href="privacidad.html" class="text-brand-700 underline">Política de Privacidad</a>.</span>
+                </label>
+
+                <div id="form-message" class="hidden rounded-lg px-4 py-3 text-sm" role="alert" aria-live="assertive"></div>
+
+                <button type="submit" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white font-bold px-8 py-3 rounded-xl shadow transition">Enviar reclamación</button>
+            </form>
+
+            <div id="complaint-success" class="hidden text-center space-y-4 py-6" tabindex="-1">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full grid place-items-center mx-auto text-3xl" aria-hidden="true">✓</div>
+                <h2 class="text-2xl font-black text-slate-900">Reclamación registrada</h2>
+                <p class="text-slate-600">Tu código de registro es:</p>
+                <p id="complaint-code" class="text-3xl font-black tracking-wider text-brand-700"></p>
+                <p class="text-sm text-slate-600 max-w-md mx-auto">Guarda este código. Te responderemos al correo indicado en un plazo máximo de 15 días hábiles.</p>
+                <div class="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+                    <button type="button" onclick="window.print()" class="border border-slate-300 hover:bg-slate-50 font-bold px-6 py-3 rounded-xl">Imprimir / guardar copia</button>
+                    <a href="../index.html" class="bg-brand-600 hover:bg-brand-700 text-white font-bold px-6 py-3 rounded-xl">Volver al inicio</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 text-center text-xs py-6 px-4">&copy; 2026 Orquídea Tour Perú · <a href="terminos.html" class="hover:text-white underline">Términos</a> · <a href="privacidad.html" class="hover:text-white underline">Privacidad</a></footer>
+
+    <style>
+        .field { display: block; width: 100%; margin-top: 0.25rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; padding: 0.7rem 0.85rem; font-size: 0.95rem; font-weight: 400; background: #fff; }
+        .field:focus { outline: none; border-color: #22c55e; box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25); }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="../config/supabase-config.js" defer></script>
+    <script src="../config/app-config.js" defer></script>
+    <script src="../js/reclamaciones.js" defer></script>
+</body>
+</html>

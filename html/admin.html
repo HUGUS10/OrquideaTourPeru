@@ -34,37 +34,41 @@
 
                 <nav class="space-y-1 text-xs">
                     <span class="text-slate-500 font-bold uppercase tracking-wider px-3 block mb-2 text-[10px]">Gestión Principal</span>
-                    <button onclick="switchAdminTab('dash')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-brand-600 text-white font-semibold text-left">
+                    <button type="button" data-admin-tab="dash" onclick="switchAdminTab('dash')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-brand-600 text-white font-semibold text-left">
                         <i class="fa-solid fa-chart-pie w-4"></i> Dashboard
                     </button>
-                    <button onclick="switchAdminTab('reservas')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
+                    <button type="button" data-admin-tab="reservas" onclick="switchAdminTab('reservas')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
                         <i class="fa-solid fa-calendar-check w-4"></i> Control Reservas
                     </button>
-                    <button onclick="switchAdminTab('ventas')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
+                    <button type="button" data-admin-tab="ventas" onclick="switchAdminTab('ventas')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
                         <i class="fa-solid fa-cash-register w-4"></i> Ventas
                     </button>
-                    <button onclick="switchAdminTab('clientes')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
+                    <button type="button" data-admin-tab="clientes" onclick="switchAdminTab('clientes')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
                         <i class="fa-solid fa-users w-4"></i> Clientes
                     </button>
-                    <button onclick="switchAdminTab('paquetes')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
+                    <button type="button" data-admin-tab="paquetes" onclick="switchAdminTab('paquetes')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
                         <i class="fa-solid fa-cubes w-4"></i> Paquetes
                     </button>
-                    <button onclick="switchAdminTab('promociones')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
+                    <button type="button" data-admin-tab="promociones" onclick="switchAdminTab('promociones')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
                         <i class="fa-solid fa-tags w-4"></i> Promociones
                     </button>
-                    <button onclick="switchAdminTab('disponibilidad')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
+                    <button type="button" data-admin-tab="disponibilidad" onclick="switchAdminTab('disponibilidad')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
                         <i class="fa-solid fa-chart-simple w-4"></i> Disponibilidad
                     </button>
 
                     <span class="text-slate-500 font-bold uppercase tracking-wider px-3 block mt-6 mb-2 text-[10px]">Análisis y Auditoría</span>
-                    <button onclick="switchAdminTab('reportes')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
+                    <button type="button" data-admin-tab="reportes" onclick="switchAdminTab('reportes')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
                         <i class="fa-solid fa-file-invoice-dollar w-4"></i> Reportes
                     </button>
-                    <button onclick="switchAdminTab('facturacion')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
+                    <button type="button" data-admin-tab="facturacion" onclick="switchAdminTab('facturacion')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
                         <i class="fa-solid fa-receipt w-4"></i> Boletas y facturas
                     </button>
-                    <button onclick="switchAdminTab('historial')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
-                        <i class="fa-solid fa-shield-halved w-4"></i> Historial Audit
+                    <button type="button" data-admin-tab="historial" onclick="switchAdminTab('historial')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
+                        <i class="fa-solid fa-shield-halved w-4"></i> Historial
+                    </button>
+                    <button type="button" data-admin-tab="reclamaciones" onclick="switchAdminTab('reclamaciones')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition text-left">
+                        <i class="fa-solid fa-book w-4"></i> Libro de Reclamaciones
+                        <span id="admin-complaints-badge" class="hidden ml-auto bg-rose-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full"></span>
                     </button>
                 </nav>
             </div>
@@ -93,7 +97,7 @@
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="bg-slate-800 text-slate-300 text-xs px-3 py-1.5 rounded-xl border border-slate-700">
-                        <i class="fa-solid fa-calendar mr-1"></i> Sep 30, 2026
+                        <i class="fa-solid fa-calendar mr-1"></i> <span id="admin-today"></span>
                     </span>
                     <button onclick="switchView('landing')" class="bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs px-3.5 py-1.5 rounded-xl shadow transition">
                         Ver Sitio
@@ -112,11 +116,13 @@
                 <option value="disponibilidad">Disponibilidad</option>
                 <option value="reportes">Reportes</option>
                 <option value="facturacion">Boletas y facturas</option>
-                <option value="historial">Historial Audit</option>
+                <option value="historial">Historial</option>
+                <option value="reclamaciones">Libro de Reclamaciones</option>
             </select>
 
             <!-- SECCIÓN 1: DASHBOARD DE MÉTRICAS -->
             <div id="admin-tab-dash" class="space-y-6">
+                <div id="admin-alerts" class="grid gap-3"></div>
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                         <h2 class="text-lg font-extrabold text-white">Resumen operativo</h2>
@@ -264,47 +270,7 @@
                                 </tr>
                             </thead>
                             <tbody id="admin-bookings-body" class="divide-y divide-slate-700/50">
-                                <tr class="hover:bg-slate-700/30">
-                                    <td class="p-3 font-mono font-bold text-brand-400">RES-000125</td>
-                                    <td class="p-3 font-semibold text-white">Hugo Sánchez</td>
-                                    <td class="p-3">Experiencia Machu Picchu</td>
-                                    <td class="p-3">15/10/2026</td>
-                                    <td class="p-3">3</td>
-                                    <td class="p-3 font-bold text-white">S/ 2,040</td>
-                                    <td class="p-3" id="status-badge-125"><span class="bg-amber-500/20 text-amber-300 font-bold px-2 py-0.5 rounded text-[10px]">PENDIENTE</span></td>
-                                    <td class="p-3 text-right space-x-2">
-                                        <button onclick="adminConfirmBooking('RES-000125')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1 rounded text-[10px] transition">
-                                            Confirmar
-                                        </button>
-                                        <button onclick="adminRejectBooking('RES-000125')" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-2.5 py-1 rounded text-[10px] transition">
-                                            Cancelar
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-slate-700/30">
-                                    <td class="p-3 font-mono font-bold text-brand-400">RES-000124</td>
-                                    <td class="p-3 font-semibold text-white">María López</td>
-                                    <td class="p-3">Paracas & Huacachina</td>
-                                    <td class="p-3">10/10/2026</td>
-                                    <td class="p-3">2</td>
-                                    <td class="p-3 font-bold text-white">S/ 640</td>
-                                    <td class="p-3"><span class="bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded text-[10px]">CONFIRMADA</span></td>
-                                    <td class="p-3 text-right">
-                                        <span class="text-slate-500 italic text-[10px]">Sin acciones pendientes</span>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-slate-700/30">
-                                    <td class="p-3 font-mono font-bold text-brand-400">RES-000123</td>
-                                    <td class="p-3 font-semibold text-white">Carlos Ramírez</td>
-                                    <td class="p-3">Ruta del Colca Místico</td>
-                                    <td class="p-3">05/10/2026</td>
-                                    <td class="p-3">1</td>
-                                    <td class="p-3 font-bold text-white">S/ 450</td>
-                                    <td class="p-3"><span class="bg-sky-500/20 text-sky-300 font-bold px-2 py-0.5 rounded text-[10px]">FINALIZADA</span></td>
-                                    <td class="p-3 text-right">
-                                        <span class="text-slate-500 italic text-[10px]">Completada</span>
-                                    </td>
-                                </tr>
+                                <tr><td colspan="8" class="p-6 text-center text-slate-400">Cargando reservas...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -317,52 +283,7 @@
                     <h3 class="font-extrabold text-lg text-white mb-2">Control de Disponibilidad y Cupos</h3>
                     <p class="text-xs text-slate-400 mb-6">Monitoreo en tiempo real de vacantes ocupadas y disponibles por paquete turístico.</p>
 
-                    <div class="space-y-6 max-w-3xl">
-                        <!-- BARRA DISPONIBILIDAD 1 -->
-                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
-                            <div class="flex justify-between items-center text-xs mb-2">
-                                <span class="font-bold text-white">Experiencia Machu Picchu</span>
-                                <span class="text-emerald-400 font-mono font-bold">12 / 20 Cupos Ocupados (60%)</span>
-                            </div>
-                            <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden">
-                                <div class="bg-brand-500 h-full rounded-full" style="width: 60%"></div>
-                            </div>
-                            <div class="flex justify-between text-[10px] text-slate-500 mt-2">
-                                <span>Capacidad total: 20 personas</span>
-                                <span class="text-emerald-400 font-bold">8 Cupos libres</span>
-                            </div>
-                        </div>
-
-                        <!-- BARRA DISPONIBILIDAD 2 -->
-                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
-                            <div class="flex justify-between items-center text-xs mb-2">
-                                <span class="font-bold text-white">Paracas & Huacachina</span>
-                                <span class="text-amber-400 font-mono font-bold">22 / 30 Cupos Ocupados (73%)</span>
-                            </div>
-                            <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden">
-                                <div class="bg-amber-500 h-full rounded-full" style="width: 73%"></div>
-                            </div>
-                            <div class="flex justify-between text-[10px] text-slate-500 mt-2">
-                                <span>Capacidad total: 30 personas</span>
-                                <span class="text-amber-400 font-bold">8 Cupos libres</span>
-                            </div>
-                        </div>
-
-                        <!-- BARRA DISPONIBILIDAD 3 -->
-                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
-                            <div class="flex justify-between items-center text-xs mb-2">
-                                <span class="font-bold text-white">Ruta del Colca Místico</span>
-                                <span class="text-rose-400 font-mono font-bold">11 / 15 Cupos Ocupados (73%)</span>
-                            </div>
-                            <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden">
-                                <div class="bg-rose-500 h-full rounded-full" style="width: 73%"></div>
-                            </div>
-                            <div class="flex justify-between text-[10px] text-slate-500 mt-2">
-                                <span>Capacidad total: 15 personas</span>
-                                <span class="text-rose-400 font-bold">4 Cupos libres (Crítico)</span>
-                            </div>
-                        </div>
-                    </div>
+                    <div id="admin-availability-list" class="space-y-4 max-w-3xl"></div>
                 </div>
             </div>
 
@@ -463,7 +384,7 @@
             <!-- SECCIÓN 4: HISTORIAL Y AUDITORÍA DE OPERACIONES -->
             <div id="admin-tab-historial" class="hidden space-y-4">
                 <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-                    <h3 class="font-extrabold text-lg text-white mb-4">Historial de Operaciones y Auditoría del Sistema</h3>
+                    <h3 class="font-extrabold text-lg text-white mb-4">Historial de operaciones (últimos movimientos)</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full min-w-[600px] text-left text-xs text-slate-300">
                             <thead class="bg-slate-900 text-slate-400 font-bold uppercase border-b border-slate-700">
@@ -475,34 +396,33 @@
                                     <th class="p-3">Fecha y Hora</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-700/50 font-mono text-[11px]">
-                                <tr>
-                                    <td class="p-3 text-white">Administrador General</td>
-                                    <td class="p-3 text-emerald-400">Confirmó estado de reserva</td>
-                                    <td class="p-3">Reservas</td>
-                                    <td class="p-3 text-brand-400">RES-000124</td>
-                                    <td class="p-3 text-slate-400">30/09/2026 15:30:12</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-3 text-sky-400">Hugo Sánchez (Cliente)</td>
-                                    <td class="p-3 text-amber-400">Registró solicitud de reserva</td>
-                                    <td class="p-3">Reservas</td>
-                                    <td class="p-3 text-brand-400">RES-000125</td>
-                                    <td class="p-3 text-slate-400">30/09/2026 14:20:05</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-3 text-white">Administrador General</td>
-                                    <td class="p-3 text-sky-400">Actualizó disponibilidad de paquete</td>
-                                    <td class="p-3">Paquetes</td>
-                                    <td class="p-3 text-brand-400">PAQ-CUSCO-01</td>
-                                    <td class="p-3 text-slate-400">30/09/2026 10:15:44</td>
-                                </tr>
+                            <tbody id="admin-history-body" class="divide-y divide-slate-700/50 text-[11px]">
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
+        
+            <!-- LIBRO DE RECLAMACIONES -->
+            <div id="admin-tab-reclamaciones" class="hidden space-y-4">
+                <section class="bg-slate-800 p-5 sm:p-6 rounded-2xl border border-slate-700">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                        <div>
+                            <h3 class="font-extrabold text-lg text-white">Libro de Reclamaciones</h3>
+                            <p class="text-xs text-slate-400 mt-1">Responde cada reclamo o queja en un plazo máximo de 15 días hábiles.</p>
+                        </div>
+                        <label class="sr-only" for="admin-complaint-filter">Filtrar reclamos</label>
+                        <select id="admin-complaint-filter" onchange="renderComplaints()" class="bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-xs text-white focus:outline-none">
+                            <option value="">Todos</option>
+                            <option value="pendiente">Pendientes</option>
+                            <option value="en_proceso">En proceso</option>
+                            <option value="respondido">Respondidos</option>
+                        </select>
+                    </div>
+                    <div id="admin-complaints-list" class="space-y-3"></div>
+                </section>
+            </div>
         </main>
     </div>    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../config/supabase-config.js"></script>

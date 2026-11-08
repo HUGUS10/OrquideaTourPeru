@@ -40,7 +40,8 @@
             passengers: row.passenger_count,
             price: Number(row.unit_price),
             total: Number(row.total),
-            status: statusToUi[row.status] || 'PENDIENTE'
+            status: statusToUi[row.status] || 'PENDIENTE',
+            createdAt: row.created_at
         };
     }
 
@@ -73,6 +74,50 @@
             tax: Number(row.tax),
             total: Number(row.total)
         };
+    }
+
+    function mapComplaint(row) {
+        return {
+            id: row.id,
+            code: row.complaint_code,
+            kind: row.kind,
+            name: row.consumer_name,
+            documentType: row.document_type,
+            documentNumber: row.document_number,
+            address: row.address,
+            phone: row.phone || '',
+            email: row.email,
+            isMinor: row.is_minor,
+            guardian: row.guardian_name || '',
+            goodType: row.good_type,
+            amount: row.claimed_amount === null ? null : Number(row.claimed_amount),
+            goodDescription: row.good_description,
+            detail: row.detail,
+            request: row.request,
+            status: row.status,
+            response: row.response || '',
+            respondedAt: row.responded_at,
+            createdAt: row.created_at
+        };
+    }
+
+    async function loadComplaints() {
+        const result = await client.from('complaints').select('*').order('created_at', { ascending: false });
+        if (result.error) {
+            console.warn('Libro de reclamaciones no disponible (ejecuta database/libro_reclamaciones.sql):', result.error.message);
+            return [];
+        }
+        return result.data.map(mapComplaint);
+    }
+
+    async function updateComplaint(complaintId, values) {
+        const result = await client.from('complaints').update(values).eq('id', complaintId).select('*').single();
+        return mapComplaint(throwIfError(result));
+    }
+
+    async function submitComplaint(payload) {
+        const result = await client.rpc('submit_complaint', { payload });
+        return throwIfError(result);
     }
 
     async function currentRole(userId) {
@@ -122,7 +167,8 @@
             packages: rolePackages.map(mapPackage),
             promotions: rolePromotions.map(mapPromotion),
             bookings: roleBookings.map(mapBooking),
-            invoices: roleReceipts.map(mapReceipt)
+            invoices: roleReceipts.map(mapReceipt),
+            complaints: role === 'admin' ? await loadComplaints() : []
         };
     }
 
@@ -274,6 +320,9 @@
         updateBookingStatus,
         cancelOwnBooking,
         createReceipt,
-        removeOwnAccount
+        removeOwnAccount,
+        loadComplaints,
+        updateComplaint,
+        submitComplaint
     };
 })();
