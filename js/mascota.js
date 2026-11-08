@@ -1,61 +1,69 @@
-// Mascota "Orqui", una llamita peruana original para las pantallas de acceso.
+// Mascota "Inti": el sol del logo de Orquídea Tour Perú, para las pantallas de acceso.
 // Sigue con la mirada lo que escribes, se tapa los ojos con la contraseña,
 // espía si la muestras, se entristece si hay error y sonríe al entrar.
 (() => {
     const SVG = `
-<svg class="mascot" viewBox="18 -4 164 164" role="img" aria-label="Orqui, la llamita de Orquídea Tour Perú">
+<svg class="mascot" viewBox="0 0 200 200" role="img" aria-label="Inti, el sol de Orquídea Tour Perú">
+  <defs>
+    <radialGradient id="inti-body" cx="42%" cy="36%" r="70%">
+      <stop offset="0" stop-color="#fff3a3"/><stop offset="0.45" stop-color="#ffd23f"/><stop offset="1" stop-color="#f7941d"/>
+    </radialGradient>
+    <linearGradient id="inti-ray" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd23f"/><stop offset="1" stop-color="#f7941d"/>
+    </linearGradient>
+    <linearGradient id="inti-hill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#c5e063"/><stop offset="1" stop-color="#7cb342"/>
+    </linearGradient>
+    <linearGradient id="inti-hand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffcf3a"/><stop offset="1" stop-color="#f7941d"/>
+    </linearGradient>
+  </defs>
+  <!-- montaña verde del logo -->
+  <path d="M-10 200 L-10 168 C30 150 58 120 92 132 C120 142 150 118 214 150 L214 200 Z" fill="url(#inti-hill)"/>
+  <path d="M-10 182 C40 170 70 152 104 160 C140 168 170 150 214 168 L214 200 L-10 200 Z" fill="#8dc63f" opacity="0.8"/>
   <g class="head-group">
-    <!-- orejas con borlas peruanas -->
-    <g>
-      <ellipse cx="62" cy="40" rx="13" ry="30" fill="#f3e3c3" transform="rotate(-18 62 40)"/>
-      <ellipse cx="62" cy="44" rx="6" ry="20" fill="#f9a8d4" transform="rotate(-18 62 44)"/>
-      <ellipse cx="138" cy="40" rx="13" ry="30" fill="#f3e3c3" transform="rotate(18 138 40)"/>
-      <ellipse cx="138" cy="44" rx="6" ry="20" fill="#f9a8d4" transform="rotate(18 138 44)"/>
-      <g class="tassel"><line x1="52" y1="18" x2="48" y2="6" stroke="#dc2626" stroke-width="3"/><circle cx="47" cy="5" r="6" fill="#ef4444"/><circle cx="54" cy="9" r="4" fill="#f59e0b"/></g>
-      <g class="tassel t2"><line x1="148" y1="18" x2="152" y2="6" stroke="#7c3aed" stroke-width="3"/><circle cx="153" cy="5" r="6" fill="#8b5cf6"/><circle cx="146" cy="9" r="4" fill="#10b981"/></g>
-    </g>
-    <!-- cuello y cabeza -->
-    <rect x="66" y="130" width="68" height="80" rx="30" fill="#f3e3c3"/>
-    <ellipse cx="100" cy="98" rx="56" ry="54" fill="#f7ead0"/>
-    <!-- lana del copete -->
-    <g fill="#fffaf0">
-      <circle cx="78" cy="52" r="13"/><circle cx="95" cy="45" r="15"/><circle cx="113" cy="47" r="14"/><circle cx="126" cy="56" r="11"/><circle cx="86" cy="60" r="10"/><circle cx="108" cy="58" r="11"/>
-    </g>
+    <!-- rayos del sol (giran lentamente) -->
+    <g class="rays"><rect x="96" y="14" width="8" height="20" rx="4" fill="url(#inti-ray)" transform="rotate(0 100 96)"/><rect x="96" y="14" width="8" height="20" rx="4" fill="url(#inti-ray)" transform="rotate(30 100 96)"/><rect x="96" y="14" width="8" height="20" rx="4" fill="url(#inti-ray)" transform="rotate(60 100 96)"/><rect x="96" y="14" width="8" height="20" rx="4" fill="url(#inti-ray)" transform="rotate(90 100 96)"/><rect x="96" y="14" width="8" height="20" rx="4" fill="url(#inti-ray)" transform="rotate(120 100 96)"/><rect x="96" y="14" width="8" height="20" rx="4" fill="url(#inti-ray)" transform="rotate(150 100 96)"/><rect x="96" y="14" width="8" height="20" rx="4" fill="url(#inti-ray)" transform="rotate(180 100 96)"/><rect x="96" y="14" width="8" height="20" rx="4" fill="url(#inti-ray)" transform="rotate(210 100 96)"/><rect x="96" y="14" width="8" height="20" rx="4" fill="url(#inti-ray)" transform="rotate(240 100 96)"/><rect x="96" y="14" width="8" height="20" rx="4" fill="url(#inti-ray)" transform="rotate(270 100 96)"/><rect x="96" y="14" width="8" height="20" rx="4" fill="url(#inti-ray)" transform="rotate(300 100 96)"/><rect x="96" y="14" width="8" height="20" rx="4" fill="url(#inti-ray)" transform="rotate(330 100 96)"/></g>
+    <!-- cuerpo del sol -->
+    <circle cx="100" cy="96" r="50" fill="url(#inti-body)"/>
+    <circle cx="100" cy="96" r="50" fill="none" stroke="#f7941d" stroke-width="2.5" opacity="0.6"/>
+    <!-- espiral del logo -->
+    <path d="M128 66 c-6 -6 -16 -4 -17 4 c-1 6 6 9 10 6 c3 -2 1 -6 -2 -5" fill="none" stroke="#f7941d" stroke-width="3" stroke-linecap="round" opacity="0.75"/>
     <!-- mejillas -->
-    <ellipse cx="66" cy="112" rx="10" ry="6" fill="#fda4af" opacity="0.7"/>
-    <ellipse cx="134" cy="112" rx="10" ry="6" fill="#fda4af" opacity="0.7"/>
+    <ellipse cx="74" cy="110" rx="9" ry="5.5" fill="#fb7185" opacity="0.5"/>
+    <ellipse cx="126" cy="110" rx="9" ry="5.5" fill="#fb7185" opacity="0.5"/>
     <!-- ojos -->
     <g class="eyes-open">
       <g class="blink">
-        <ellipse cx="80" cy="88" rx="11" ry="13" fill="#fff"/>
-        <ellipse cx="120" cy="88" rx="11" ry="13" fill="#fff"/>
+        <ellipse cx="84" cy="92" rx="10" ry="12" fill="#fff"/>
+        <ellipse cx="116" cy="92" rx="10" ry="12" fill="#fff"/>
         <g class="pupils">
-          <circle cx="80" cy="90" r="6.5" fill="#1e293b"/><circle cx="82.5" cy="87.5" r="2" fill="#fff"/>
-          <circle cx="120" cy="90" r="6.5" fill="#1e293b"/><circle cx="122.5" cy="87.5" r="2" fill="#fff"/>
+          <circle cx="84" cy="94" r="6" fill="#3b2412"/><circle cx="86.3" cy="91.5" r="2" fill="#fff"/>
+          <circle cx="116" cy="94" r="6" fill="#3b2412"/><circle cx="118.3" cy="91.5" r="2" fill="#fff"/>
         </g>
       </g>
-      <path class="tear" d="M70 102 q-3 6 0 8 q3 -2 0 -8z" fill="#38bdf8"/>
+      <path class="tear" d="M74 106 q-3 6 0 8 q3 -2 0 -8z" fill="#38bdf8"/>
     </g>
-    <g class="eyes-happy" stroke="#1e293b" stroke-width="4" stroke-linecap="round" fill="none">
-      <path d="M70 90 q10 -12 20 0"/><path d="M110 90 q10 -12 20 0"/>
+    <g class="eyes-happy" stroke="#3b2412" stroke-width="4" stroke-linecap="round" fill="none">
+      <path d="M75 94 q9 -11 18 0"/><path d="M107 94 q9 -11 18 0"/>
     </g>
-    <!-- hocico -->
-    <ellipse cx="100" cy="122" rx="26" ry="19" fill="#fffaf0"/>
-    <path d="M93 115 q7 6 14 0" stroke="#7c5a3a" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    <!-- boca -->
     <g class="mouth">
-      <path class="mouth-normal" d="M100 120 v6 M92 128 q8 6 16 0" stroke="#7c5a3a" stroke-width="3" stroke-linecap="round" fill="none"/>
-      <path class="mouth-sad" d="M100 120 v6 M91 133 q9 -7 18 0" stroke="#7c5a3a" stroke-width="3" stroke-linecap="round" fill="none"/>
-      <path class="mouth-happy" d="M100 120 v4 M88 126 q12 14 24 0z" stroke="#7c5a3a" stroke-width="3" stroke-linejoin="round" fill="#fb7185"/>
+      <path class="mouth-normal" d="M88 115 q12 11 24 0" stroke="#7c2d12" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+      <path class="mouth-sad" d="M89 121 q11 -9 22 0" stroke="#7c2d12" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+      <path class="mouth-happy" d="M85 113 q15 18 30 0z" stroke="#7c2d12" stroke-width="3" stroke-linejoin="round" fill="#fb7185"/>
     </g>
   </g>
-  <!-- patitas que tapan los ojos -->
+  <!-- manitos de sol que tapan los ojos -->
   <g class="arm arm-left">
-    <path d="M40 200 C40 150 50 112 68 92 C76 84 92 86 94 96 C96 106 86 112 80 120 C70 136 66 170 66 200 Z" fill="#ead6ad" stroke="#d9c08f" stroke-width="2"/>
-    <ellipse cx="81" cy="91" rx="18" ry="15" fill="#8b5e3c"/><ellipse cx="76" cy="86" rx="5" ry="3" fill="#a87a52"/>
+    <path d="M52 210 C52 170 60 132 72 108 C76 100 86 100 88 108 C90 116 82 126 80 136 C76 160 74 186 76 210 Z" fill="url(#inti-hand)"/>
+    <circle cx="84" cy="94" r="16" fill="url(#inti-hand)" stroke="#f7941d" stroke-width="2"/>
+    <path d="M76 84 v-8 M84 81 v-9 M92 84 v-8" stroke="#f7941d" stroke-width="5" stroke-linecap="round"/>
   </g>
   <g class="arm arm-right">
-    <path d="M160 200 C160 150 150 112 132 92 C124 84 108 86 106 96 C104 106 114 112 120 120 C130 136 134 170 134 200 Z" fill="#ead6ad" stroke="#d9c08f" stroke-width="2"/>
-    <ellipse cx="119" cy="91" rx="18" ry="15" fill="#8b5e3c"/><ellipse cx="124" cy="86" rx="5" ry="3" fill="#a87a52"/>
+    <path d="M148 210 C148 170 140 132 128 108 C124 100 114 100 112 108 C110 116 118 126 120 136 C124 160 126 186 124 210 Z" fill="url(#inti-hand)"/>
+    <circle cx="116" cy="94" r="16" fill="url(#inti-hand)" stroke="#f7941d" stroke-width="2"/>
+    <path d="M108 84 v-8 M116 81 v-9 M124 84 v-8" stroke="#f7941d" stroke-width="5" stroke-linecap="round"/>
   </g>
 </svg>`;
 

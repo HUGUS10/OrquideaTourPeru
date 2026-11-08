@@ -316,7 +316,12 @@
                 modal.querySelector('#vt-gyro').hidden = !viewer.isOrientationSupported();
                 modal.querySelector('#vt-rotate').setAttribute('aria-pressed', 'true');
             });
-            viewer.on('error', () => modal.classList.remove('is-loading'));
+            viewer.on('error', () => {
+                modal.classList.remove('is-loading');
+                modal.querySelector('#vt-stop-title').textContent = 'No se pudo cargar la imagen de la visita';
+                modal.querySelector('#vt-stop-text').textContent = 'Revisa tu conexión. Si eres el administrador, sube la foto 360° desde el panel en lugar de pegar un enlace externo.';
+                modal.querySelector('.vt-caption').classList.add('show');
+            });
             viewer.on('mousedown', stopGuided);
             viewer.on('touchstart', stopGuided);
         } catch (error) {

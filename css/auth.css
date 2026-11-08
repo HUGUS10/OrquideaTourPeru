@@ -16,7 +16,7 @@
   inset: 0;
   z-index: 0;
   overflow: hidden;
-  background: linear-gradient(135deg, #064e3b 0%, #0f766e 45%, #0369a1 100%);
+  background: linear-gradient(160deg, #0369a1 0%, #0e7490 40%, #3f7d20 100%);
   background-size: 200% 200%;
   animation: auth-gradient 18s ease-in-out infinite;
 }
@@ -36,9 +36,9 @@
   animation: auth-float 16s ease-in-out infinite;
 }
 
-.auth-blob.b1 { width: 340px; height: 340px; background: #22c55e; top: -80px; left: -60px; }
-.auth-blob.b2 { width: 280px; height: 280px; background: #f59e0b; bottom: 10%; right: -70px; animation-delay: -5s; opacity: 0.35; }
-.auth-blob.b3 { width: 240px; height: 240px; background: #38bdf8; top: 35%; left: 55%; animation-delay: -9s; opacity: 0.35; }
+.auth-blob.b1 { width: 340px; height: 340px; background: #8dc63f; top: -80px; left: -60px; }
+.auth-blob.b2 { width: 300px; height: 300px; background: #ffd23f; top: -60px; right: -60px; animation-delay: -5s; opacity: 0.5; }
+.auth-blob.b3 { width: 240px; height: 240px; background: #f7941d; top: 35%; left: 55%; animation-delay: -9s; opacity: 0.35; }
 
 .auth-mountains {
   position: absolute;
@@ -124,7 +124,7 @@
   transform: translateX(-50%);
   border-radius: 9999px;
   overflow: hidden;
-  background: radial-gradient(circle at 50% 35%, #fef9c3, #fde68a 55%, #fbbf24);
+  background: linear-gradient(180deg, #d8f1fb 0%, #b3e1f5 55%, #e9f7d2 100%);
   border: 6px solid #fff;
   box-shadow: 0 18px 40px -12px rgba(2, 44, 34, 0.6);
 }
@@ -147,11 +147,11 @@
 .mascot .arm { transform: translateY(130px); }
 .mascot.is-covering .arm-left,
 .mascot.is-covering .arm-right { transform: translateY(0); }
-.mascot.is-covering.is-peeking .arm-right { transform: translateY(30px); }
+.mascot.is-covering.is-peeking .arm-right { transform: translateY(32px); }
 .mascot.is-covering .head-group { transform: translateY(4px); }
 
-.mascot .lids { transform: scaleY(0); transform-origin: 50% 84px; }
-.mascot .blink { animation: mascot-blink 5s infinite; transform-origin: 50% 84px; }
+.mascot .lids { transform: scaleY(0); transform-origin: 50% 92px; }
+.mascot .blink { animation: mascot-blink 5s infinite; transform-origin: 50% 92px; }
 
 @keyframes mascot-blink {
   0%, 92%, 100% { transform: scaleY(1); }
@@ -181,12 +181,12 @@
   50% { transform: translateY(-6px); }
 }
 
-.mascot .tassel { animation: mascot-sway 3s ease-in-out infinite; transform-box: fill-box; transform-origin: top center; }
-.mascot .tassel.t2 { animation-delay: -1.5s; }
+.mascot .rays { animation: mascot-rays 28s linear infinite; transform-box: view-box; transform-origin: 100px 96px; }
+.mascot.is-happy .rays { animation-duration: 4s; }
+.mascot.is-sad .rays { opacity: 0.55; transition: opacity 0.3s ease; }
 
-@keyframes mascot-sway {
-  0%, 100% { transform: rotate(-6deg); }
-  50% { transform: rotate(6deg); }
+@keyframes mascot-rays {
+  to { transform: rotate(360deg); }
 }
 
 /* Campos */
@@ -265,7 +265,7 @@
   padding: 0.95rem 1rem;
   font-weight: 800;
   color: #fff;
-  background: linear-gradient(135deg, #16a34a, #0d9488);
+  background: linear-gradient(135deg, #7cb342, #16a34a 55%, #0d9488);
   box-shadow: 0 12px 24px -10px rgba(22, 163, 74, 0.7);
   transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
@@ -307,5 +307,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .auth-bg, .auth-blob, .auth-card, .auth-submit::after, .mascot .blink, .mascot .tassel { animation: none !important; }
+  .auth-bg, .auth-blob, .auth-card, .auth-submit::after, .mascot .blink, .mascot .rays { animation: none !important; }
 }
