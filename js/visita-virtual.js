@@ -420,7 +420,7 @@
 
         const total = current.scenes.length;
         const sideYaw = full || wraps ? 40 : Math.max(10, Math.min(40, haov / 2 - fitHfov / 4));
-        const hotSpots = [{ pitch: full ? 12 : vaov * 0.22, yaw: scene.yaw || 0, type: 'info', cssClass: 'vt-banner-hs', createTooltipFunc: bannerTooltip, createTooltipArgs: scene.title }];
+        const hotSpots = [{ pitch: full ? 6 : vaov * 0.08, yaw: scene.yaw || 0, type: 'info', cssClass: 'vt-banner-hs', createTooltipFunc: bannerTooltip, createTooltipArgs: scene.title }];
         if (total > 1) {
             const next = current.scenes[(index + 1) % total];
             const prev = current.scenes[(index - 1 + total) % total];
